@@ -25,23 +25,23 @@ export async function readDataFrame(path, metadata, globals, options = {}) {
         for (const [i, k] of Object.entries(colnames)) {
             let iname = String(i)
             if (kids.indexOf(iname) < 0) {
-                handle_stack[k] = readObject(path + "/other_columns/" + iname, globals, options);
+                collected[k] = await readObject(path + "/other_columns/" + iname, null, globals, options);
                 continue;
             }
 
             let child_handle = dhandle.open(iname);
             handle_stack.push(child_handle);
-            let child_attrs = child_handle.attributes();
 
             if (child_handle instanceof H5DataSet) {
                 let vals;
                 let rawvals = child_handle.values();
                 let type = child_handle.readAttribute("type").values[0];
 
+                let child_attrs = child_handle.attributes();
                 let has_missing = child_attrs.indexOf("missing-value-placeholder") >= 0;
                 let missing_attr;
                 if (has_missing) {
-                    missing_attr = child_handle.readAttribute("missing-value-placeholder");
+                    missing_attr = child_handle.readAttribute("missing-value-placeholder").values[0];
                 }
 
                 if (type == "number") {
@@ -122,14 +122,12 @@ export async function readDataFrame(path, metadata, globals, options = {}) {
                     handle_stack.push(cohandle);
                     let codes = cohandle.values();
                     let code_attrs = cohandle.attributes();
-                    cohandle.close();
-                    handle_stack.pop();
 
                     // Just reading factors as string vectors here, as we don't have a separate
                     // representation in Javascript for a factor.
                     let vals = Array(codes.length);
                     if (code_attrs.indexOf("missing-value-placeholder") >= 0) {
-                        let missing_attr = child_handle.readAttribute("missing-value-placeholder").values[0];
+                        let missing_attr = cohandle.readAttribute("missing-value-placeholder").values[0];
                         for (let i = 0; i < codes.length; i++) {
                             if (codes[i] == missing_attr) {
                                 vals[i] = null;
@@ -144,6 +142,8 @@ export async function readDataFrame(path, metadata, globals, options = {}) {
                     }
 
                     collected[k] = vals;
+                    cohandle.close();
+                    handle_stack.pop();
 
                 } else if (type == "vls") {
                     let hhandle = child_handle.open("heap");
@@ -156,8 +156,6 @@ export async function readDataFrame(path, metadata, globals, options = {}) {
                     handle_stack.push(phandle);
                     let pointers = phandle.values();
                     let pointer_attrs = phandle.attributes();
-                    phandle.close();
-                    handle_stack.pop();
 
                     let vals = new Array(pointers.length);
                     let dec = new TextDecoder;
@@ -172,7 +170,7 @@ export async function readDataFrame(path, metadata, globals, options = {}) {
                     }
 
                     if (pointer_attrs.indexOf("missing-value-placeholder") >= 0) {
-                        let missing_attr = pointers.readAttribute("missing-value-placeholder");
+                        let missing_attr = phandle.readAttribute("missing-value-placeholder").values[0];
                         for (let i = 0; i < vals.length; i++) {
                             if (vals[i] == missing_attr) {
                                 vals[i] = null;
@@ -181,6 +179,8 @@ export async function readDataFrame(path, metadata, globals, options = {}) {
                     }
 
                     collected[k] = vals;
+                    phandle.close();
+                    handle_stack.pop();
 
                 } else {
                     throw new Error("unknown type '" + type + "' in column '" + k + "' of a DataFrame at '" + path + "'");
