@@ -1,13 +1,17 @@
 import * as bioc from "bioconductor";
 import * as df from "./DataFrame.js";
 
+export async function readObjectFile(path, globals) {
+    let payload = await globals.fs.get(path + "/OBJECT", { asBuffer: true });
+    let dec = new TextDecoder;
+    return JSON.parse(dec.decode(payload));
+}
+
 export const readObject_registry = {};
 
 export async function readObject(path, metadata, globals, options = {}) {
     if (metadata == null) {
-        let payload = await globals.navigator.get(path + "/OBJECT");
-        let dec = new TextDecoder;
-        metadata = JSON.parse(dec.decode(payload));
+        metadata = await readObjectFile(path, globals);
     }
 
     let objtype = metadata["type"];
@@ -15,7 +19,7 @@ export async function readObject(path, metadata, globals, options = {}) {
         return readObject_registry[objtype](path, metadata, globals, options);
 
     } else if (objtype == "data_frame") { 
-        return readDataFrame(path, metadata, globals, options);
+        return df.readDataFrame(path, metadata, globals, options);
 
     } else {
         throw new Error("type '" + objtype + "' is not supported");
@@ -34,10 +38,10 @@ export async function saveObject(x, path, globals, options = {}) {
     }
 
     if (x instanceof bioc.DataFrame) {
-        saveDataFrame(x, path, globals, options);
+        df.saveDataFrame(x, path, globals, options);
         return;
 
     } else {
-        throw new Error("type '" + objtype + "' is not supported");
+        throw new Error("object of type '" + x.constructor.name + "' is not supported");
     }
 }

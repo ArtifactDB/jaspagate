@@ -3,12 +3,6 @@
  * This is an abstract interface that should not be created directly.
  */
 export class H5Group {
-    constructor() {
-        if (this.constructor == H5Group) {
-            throw new Error("cannot instantiate the abstract jaspilite.H5Group class");
-        }
-    }
-
     /**
      * @member {Array}
      * @desc Array containing the names of all attributes of this object.
@@ -20,7 +14,6 @@ export class H5Group {
     /**
      * @param {string} attr - Name of the attribute.
      * @return {object} Object containing the attribute `values` and the `shape` of the attribute.
-     * For HDF5 enums, an additional `level` property is present, containing the levels indexed by the integer `values`.
      */
     readAttribute(attr) {
         throw new Error("'readAttribute()' is not implemented in this H5Group subclass");
@@ -31,9 +24,8 @@ export class H5Group {
      *
      * @param {string} attr - Name of the attribute.
      * @param {string} type - Type of dataset to create.
-     * This can be `"IntX"` or `"UintX"` for `X` of 8, 16, 32, or 64;
-     * or `"FloatX"` for `X` of 32 or 64;
-     * or `"String"`.
+     * This can be `"IntX"` or `"UintX"` for `X` of 8, 16, 32, or 64; or `"FloatX"` for `X` of 32 or 64; or `"String"`.
+     * Alternatively, it may be an object specifying a compound datatype, where each key is the name and each value is a string as described above.
      * @param {?Array} shape - Array containing the dimensions of the dataset to create.
      * If set to an empty array, this will create a scalar dataset.
      * If set to `null`, this is determined from `x`.
@@ -44,7 +36,7 @@ export class H5Group {
      * Only used when `type = "String"`.
      * If `null`, this is inferred from the maximum length of strings in `x`.
      */
-    writeAttribute(attr, type, shape, x, options = {}) {
+    writeAttribute(attr, type, shape, data, options = {}) {
         throw new Error("'writeAttribute()' is not implemented in this H5Group subclass");
     }
 
@@ -79,19 +71,18 @@ export class H5Group {
 
     /**
      * @param {string} name - Name of the dataset to create.
-     * @param {string} type - Type of dataset to create.
-     * This can be `"IntX"` or `"UintX"` for `X` of 8, 16, 32, or 64;
-     * or `"FloatX"` for `X` of 32 or 64;
-     * or `"String"`.
+     * @param {string|object} type - Type of dataset to create.
+     * This can be `"IntX"` or `"UintX"` for `X` of 8, 16, 32, or 64; or `"FloatX"` for `X` of 32 or 64; or `"String"`.
+     * Alternatively, it may be an object specifying a compound datatype, where each key is the name and each value is a string as described above.
      * @param {Array} shape - Array containing the dimensions of the dataset to create.
      * This can be set to an empty array to create a scalar dataset.
      * @param {object} [options={}] - Optional parameters.
-     * @param {number} [options.maxStringLength=10] - Maximum length of the strings to be saved.
+     * @param {number} [options.maxStringLength=null] - Maximum length of the strings to be saved.
      * Only used when `type = "String"`.
-     * @param {number} [options.compression=6] - Deflate compression level.
-     * @param {?Array} [options.chunks=null] - Array containing the chunk dimensions.
-     * This should have length equal to `shape`, with each value being no greater than the corresponding value of `shape`.
-     * If `null`, it defaults to `shape`.
+     * If `null`, this should be inferred from the maximum length of strings in `options.data`.
+     * If `options.data` is `null`, this must be provided.
+     * @param {?(Array|TypedArray)} [options.data=null] - Array to be written to the dataset.
+     * This is equivalent to calling {@link H5DataSet#write H5DataSet.write} immediately after the dataset is created.
      *
      * @return {H5DataSet} A dataset of the specified type and shape is created as an immediate child of the current group.
      * A {@linkplain H5DataSet} object is returned representing this new dataset.
@@ -105,7 +96,23 @@ export class H5Group {
  * Representation of a dataset inside a HDF5 file.
  * This is an abstract interface that should not be created directly.
  */
-export class H5DataSet extends H5Base {
+export class H5DataSet {
+    /**
+     * @member {Array}
+     * @desc Array containing the names of all attributes of this object.
+     */
+    attributes() {
+        throw new Error("'attributes()' is not implemented in this H5Group subclass");
+    }
+
+    /**
+     * @param {string} attr - Name of the attribute.
+     * @return {object} Object containing the attribute `values` and the `shape` of the attribute.
+     */
+    readAttribute(attr) {
+        throw new Error("'readAttribute()' is not implemented in this H5Group subclass");
+    }
+
     /**
      * @member {object}
      * @desc String containing the type of the dataset.
@@ -132,17 +139,8 @@ export class H5DataSet extends H5Base {
      * This has length equal to the product of {@linkcode H5DataSet#shape shape};
      * unless this dataset is scalar, in which case it has length 1.
      */
-    values() {
+    value() {
         throw new Error("'values()' is not implemented in this H5DataSet subclass");
-    }
-
-    /**
-     * @member {?Array}
-     * @desc Levels of a HDF5 enum, to be indexed by the integer `values`.
-     * For non-enum data, this is set to `null`.
-     */
-    levels() {
-        throw new Error("'levels()' is not implemented in this H5DataSet subclass");
     }
 
     /**

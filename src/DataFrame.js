@@ -2,12 +2,12 @@ import { DataFrame } from "bioconductor";
 import { H5Group, H5DataSet } from "./h5.js";
 import { readObject, saveObject } from "./general.js";
 
-async function readDataFrame(path, metadata, globals, options = {}) {
+export async function readDataFrame(path, metadata, globals, options = {}) {
     let handle_stack = [];
-    let contents = await globals.navigator.get(path + "/basic_contents.h5");
+    let contents = await globals.fs.get(path + "/basic_columns.h5");
 
     try {
-        let fhandle = await globals.h5open(contents, { readOnly: true });
+        let fhandle = await globals.h5.open(contents, { readOnly: true });
         handle_stack.push(fhandle);
         let ghandle = fhandle.open("data_frame");
         handle_stack.push(ghandle);
@@ -16,44 +16,45 @@ async function readDataFrame(path, metadata, globals, options = {}) {
 
         let cnhandle = ghandle.open("column_names");
         handle_stack.push(cnhandle);
-        let col_names = cnhandle.values();
+        let colnames = cnhandle.values();
         cnhandle.close();
         handle_stack.pop();
 
+        let collected = {};
         let kids = dhandle.children();
-        for (const [i, k] of Object.entries(col_names)) {
+        for (const [i, k] of Object.entries(colnames)) {
             let iname = String(i)
-            if (children.indexOf(iname) < 0) {
-                handle_stack[k] = readObject(path + "/other_contents/" + iname, globals, options);
+            if (kids.indexOf(iname) < 0) {
+                collected[k] = await readObject(path + "/other_columns/" + iname, null, globals, options);
                 continue;
             }
 
             let child_handle = dhandle.open(iname);
             handle_stack.push(child_handle);
-            let child_attrs = child_handle.attributes();
 
-            if (child_handle instanceof H5Dataset) {
+            if (child_handle instanceof H5DataSet) {
                 let vals;
-                let rawvals = child_handle.value();
-                let type = child_handle.readAttribute("type");
+                let rawvals = child_handle.values();
+                let type = child_handle.readAttribute("type").values[0];
 
+                let child_attrs = child_handle.attributes();
                 let has_missing = child_attrs.indexOf("missing-value-placeholder") >= 0;
                 let missing_attr;
                 if (has_missing) {
-                    missing_attr = child_handle.readAttribute("missing-value-placeholder");
+                    missing_attr = child_handle.readAttribute("missing-value-placeholder").values[0];
                 }
 
                 if (type == "number") {
                     if (has_missing) {
                         vals = Array.from(rawvals)
                         if (Number.isNaN(missing_attr)) {
-                            for (var i = 0; i < vals.length; i++) {
+                            for (let i = 0; i < vals.length; i++) {
                                 if (Number.isNaN(vals[i])) {
                                     vals[i] = null;
                                 }
                             }
                         } else {
-                            for (var i = 0; i < vals.length; i++) {
+                            for (let i = 0; i < vals.length; i++) {
                                 if (vals[i] == missing_attr) {
                                     vals[i] = null;
                                 }
@@ -66,7 +67,7 @@ async function readDataFrame(path, metadata, globals, options = {}) {
                 } else if (type == "boolean") {
                     vals = new Array(rawvals.length)
                     if (has_missing) {
-                        for (var i = 0; i < rawvals.length; i++) {
+                        for (let i = 0; i < rawvals.length; i++) {
                             if (rawvals[i] == missing_attr) {
                                 vals[i] = null;
                             } else {
@@ -74,7 +75,7 @@ async function readDataFrame(path, metadata, globals, options = {}) {
                             }
                         }
                     } else {
-                        for (var i = 0; i < rawvals.length; i++) {
+                        for (let i = 0; i < rawvals.length; i++) {
                             vals[i] = (rawvals[i] != 0);
                         }
                     }
@@ -82,7 +83,7 @@ async function readDataFrame(path, metadata, globals, options = {}) {
                 } else if (type == "integer") {
                     if (has_missing) {
                         vals = Array.from(rawvals);
-                        for (var i = 0; i < vals.length; i++) {
+                        for (let i = 0; i < vals.length; i++) {
                             if (vals[i] == missing_attr) {
                                 vals[i] = null;
                             }
@@ -94,7 +95,7 @@ async function readDataFrame(path, metadata, globals, options = {}) {
                 } else if (type == "string") {
                     vals = rawvals.slice(); // make a copy, to be safe.
                     if (has_missing) {
-                        for (var i = 0; i < vals.length; i++) {
+                        for (let i = 0; i < vals.length; i++) {
                             if (vals[i] == missing_attr) {
                                 vals[i] = null;
                             }
@@ -105,31 +106,29 @@ async function readDataFrame(path, metadata, globals, options = {}) {
                     throw new Error("unknown type '" + type + "' in column '" + k + "' of a DataFrame at '" + path + "'");
                 }
 
-                handle_stack[k] = vals;
+                collected[k] = vals;
 
-            } else if (child instanceof H5Group) {
-                let type = child.readAttribute("type");
+            } else if (child_handle instanceof H5Group) {
+                let type = child_handle.readAttribute("type").values[0];
 
                 if (type == "factor") {
-                    let lhandle = child.open("levels");
+                    let lhandle = child_handle.open("levels");
                     handle_stack.push(lhandle);
-                    let levels = lhandle.value();
+                    let levels = lhandle.values();
                     lhandle.close();
                     handle_stack.pop();
 
-                    let cohandle = child.open("codes");
+                    let cohandle = child_handle.open("codes");
                     handle_stack.push(cohandle);
-                    let codes = cohandle.value();
-                    let code_attrs = codes.attributes();
-                    cohandle.close();
-                    handle_stack.pop();
+                    let codes = cohandle.values();
+                    let code_attrs = cohandle.attributes();
 
                     // Just reading factors as string vectors here, as we don't have a separate
                     // representation in Javascript for a factor.
                     let vals = Array(codes.length);
-                    if (attrs.indexOf("missing-value-placeholder") >= 0) {
-                        let missing_attr = child.readAttribute("missing-value-placeholder");
-                        for (var i = 0; i < codes.length; i++) {
+                    if (code_attrs.indexOf("missing-value-placeholder") >= 0) {
+                        let missing_attr = cohandle.readAttribute("missing-value-placeholder").values[0];
+                        for (let i = 0; i < codes.length; i++) {
                             if (codes[i] == missing_attr) {
                                 vals[i] = null;
                             } else {
@@ -137,32 +136,32 @@ async function readDataFrame(path, metadata, globals, options = {}) {
                             }
                         }
                     } else {
-                        for (var i = 0; i < codes.length; i++) {
+                        for (let i = 0; i < codes.length; i++) {
                             vals[i] = levels[codes[i]];
                         }
                     }
 
-                    handle_stack[k] = vals;
+                    collected[k] = vals;
+                    cohandle.close();
+                    handle_stack.pop();
 
                 } else if (type == "vls") {
-                    let hhandle = child.open("heap");
+                    let hhandle = child_handle.open("heap");
                     handle_stack.push(hhandle);
-                    let heap = hhandle.value();
+                    let heap = hhandle.values();
                     hhandle.close();
                     handle_stack.pop();
 
-                    let phandle = child.open("pointers");
+                    let phandle = child_handle.open("pointers");
                     handle_stack.push(phandle);
-                    let pointers = phandle.value();
-                    let pointer_attrs = pointers.attributes();
-                    phandle.close();
-                    handle_stack.pop();
+                    let pointers = phandle.values();
+                    let pointer_attrs = phandle.attributes();
 
                     let vals = new Array(pointers.length);
-                    let dec new TextDecoder;
-                    for (var i = 0; i < pointers.length; i++) {
+                    let dec = new TextDecoder;
+                    for (let i = 0; i < pointers.length; i++) {
                         const { offset, length } = pointers[i];
-                        let current = heap.slice(offset, offset + length);
+                        let current = heap.slice(Number(offset), Number(offset + length));
                         let early = current.indexOf(0);
                         if (early >= 0) {
                             current = current.slice(0, early);
@@ -171,15 +170,17 @@ async function readDataFrame(path, metadata, globals, options = {}) {
                     }
 
                     if (pointer_attrs.indexOf("missing-value-placeholder") >= 0) {
-                        let missing_attr = pointers.readAttribute("missing-value-placeholder");
-                        for (var i = 0; i < vals.length; i++) {
+                        let missing_attr = phandle.readAttribute("missing-value-placeholder").values[0];
+                        for (let i = 0; i < vals.length; i++) {
                             if (vals[i] == missing_attr) {
                                 vals[i] = null;
                             }
                         }
                     }
 
-                    handle_stack[k] = vals;
+                    collected[k] = vals;
+                    phandle.close();
+                    handle_stack.pop();
 
                 } else {
                     throw new Error("unknown type '" + type + "' in column '" + k + "' of a DataFrame at '" + path + "'");
@@ -193,102 +194,118 @@ async function readDataFrame(path, metadata, globals, options = {}) {
             handle_stack.pop();
         }
 
-        let nrows = Number(ghandle.readAttribute("row-count").value[0]);
+        let nrows = Number(ghandle.readAttribute("row-count").values[0]);
         let rownames = null;
         let gkids = ghandle.children();
         if (gkids.indexOf("row_names") >= 0) {
             let rnhandle = ghandle.open("row_names");
             handle_stack.push(rnhandle);
-            rownames = rnhandle.value();
+            rownames = rnhandle.values();
             rnhandle.close();
             handle_stack.pop();
         }
 
-        return new DataFrame(handle_stack, { columnOrder: column_names, numberOfRows: nrows, rowNames: rownames });
+        return new DataFrame(collected, { columnOrder: colnames, numberOfRows: nrows, rowNames: rownames });
 
     } finally {
         for (const handle of handle_stack.reverse()) {
             handle.close();
         }
-        globals.navigator.clean(contents);
+        globals.fs.clean(contents);
     }
 }
 
-async function saveDataFrame(x, path, globals, options = {}) {
+export async function saveDataFrame(x, path, globals, options = {}) {
+    await globals.fs.mkdir(path);
     try {
-        await globals.navigator.write(path + "/OBJECT", JSON.stringify({ type: "data_frame", version: "1.1" }));
+        await globals.fs.write(path + "/OBJECT", JSON.stringify({ type: "data_frame", data_frame: { version: "1.1" } }));
 
         let externals = {};
         let handle_stack = [];
         try {
-            let fhandle = await globals.h5open(path + "/basic_contents.h5", { readOnly: false });
+            let fhandle = await globals.h5.open(path + "/basic_columns.h5", { readOnly: false });
             handle_stack.push(fhandle);
 
-            let ghandle = handle.createGroup("data_frame");
+            let ghandle = fhandle.createGroup("data_frame");
             handle_stack.push(ghandle);
             ghandle.writeAttribute("row-count", "Uint64", [], [x.numberOfRows()]);
-            ghandle.writeDataSet("column_names", "String", [ x.numberOfColumns() ], x.columnNames()).close();
+            ghandle.createDataSet("column_names", "String", [ x.numberOfColumns() ], { data: x.columnNames(), returnHandle: false });
             if (x.rowNames() != null) {
-                ghandle.writeDataSet("row_names", "String", [ x.numberOfRows() ], x.rowNames()).close();
+                ghandle.createDataSet("row_names", "String", [ x.numberOfRows() ], { data: x.rowNames(), returnHandle: false });
             }
 
             let dhandle = ghandle.createGroup("data");
             for (const [i, k] of Object.entries(x.columnNames())) {
-                let col = x.column(i);
+                let iname = String(i);
+                let col = x.column(k);
 
                 if (col instanceof Uint8Array) {
-                    let chandle = dhandle.writeDataSet(String(i), "Uint8", [ col.length ], col);
+                    let chandle = dhandle.createDataSet(iname, "Uint8", [ col.length ], { data: col });
                     handle_stack.push(chandle);
                     chandle.writeAttribute("type", "String", [], ["integer"]);
                     chandle.close();
                     handle_stack.pop();
 
                 } else if (col instanceof Int8Array) {
-                    let chandle = dhandle.writeDataSet(String(i), "Int8", [ col.length ], col);
+                    let chandle = dhandle.createDataSet(iname, "Int8", [ col.length ], { data: col });
                     handle_stack.push(chandle);
                     chandle.writeAttribute("type", "String", [], ["integer"]);
                     chandle.close();
                     handle_stack.pop();
 
                 } else if (col instanceof Uint16Array) {
-                    let chandle = dhandle.writeDataSet(String(i), "Uint16", [ col.length ], col);
+                    let chandle = dhandle.createDataSet(iname, "Uint16", [ col.length ], { data: col });
                     handle_stack.push(chandle);
                     chandle.writeAttribute("type", "String", [], ["integer"]);
                     chandle.close();
                     handle_stack.pop();
 
                 } else if (col instanceof Int16Array) {
-                    let chandle = dhandle.writeDataSet(String(i), "Int16", [ col.length ], col);
+                    let chandle = dhandle.createDataSet(iname, "Int16", [ col.length ], { data: col });
                     handle_stack.push(chandle);
                     chandle.writeAttribute("type", "String", [], ["integer"]);
                     chandle.close();
                     handle_stack.pop();
 
                 } else if (col instanceof Uint32Array) {
-                    let chandle = dhandle.writeDataSet(String(i), "Uint32", [ col.length ], col);
+                    let chandle = dhandle.createDataSet(iname, "Uint32", [ col.length ], { data: col });
                     handle_stack.push(chandle);
                     chandle.writeAttribute("type", "String", [], ["number"]); // only up to int32 is supported by 'integer'.
                     chandle.close();
                     handle_stack.pop();
 
                 } else if (col instanceof Int32Array) {
-                    let chandle = dhandle.writeDataSet(String(i), "Int32", [ col.length ], col);
+                    let chandle = dhandle.createDataSet(iname, "Int32", [ col.length ], { data: col });
                     handle_stack.push(chandle);
                     chandle.writeAttribute("type", "String", [], ["integer"]);
                     chandle.close();
                     handle_stack.pop();
 
-                } else if (col instanceof Uint64Array) {
-                    let chandle = dhandle.writeDataSet(String(i), "Float64", [ col.length ], col);
+                } else if (col instanceof BigUint64Array) {
+                    let chandle = dhandle.createDataSet(iname, "Float64", [ col.length ], { data: col });
                     handle_stack.push(chandle);
                     chandle.writeAttribute("type", "String", [], ["number"]); // only up to int32 is supported by 'integer'.
                     chandle.close();
                     handle_stack.pop();
 
-                } else if (col instanceof Int64Array) {
-                    let chandle = dhandle.writeDataSet(String(i), "Float64", [ col.length ], col);
+                } else if (col instanceof BigInt64Array) {
+                    let chandle = dhandle.createDataSet(iname, "Float64", [ col.length ], { data: col });
                     handle_stack.push(chandle);
                     chandle.writeAttribute("type", "String", [], ["number"]); // only up to int32 is supported by 'integer'.
+                    chandle.close();
+                    handle_stack.pop();
+
+                } else if (col instanceof Float32Array) {
+                    let chandle = dhandle.createDataSet(iname, "Float32", [ col.length ], { data: col });
+                    handle_stack.push(chandle);
+                    chandle.writeAttribute("type", "String", [], ["number"]);
+                    chandle.close();
+                    handle_stack.pop();
+
+                } else if (col instanceof Float64Array) {
+                    let chandle = dhandle.createDataSet(iname, "Float64", [ col.length ], { data: col });
+                    handle_stack.push(chandle);
+                    chandle.writeAttribute("type", "String", [], ["number"]);
                     chandle.close();
                     handle_stack.pop();
 
@@ -306,7 +323,7 @@ async function saveDataFrame(x, path, globals, options = {}) {
 
                     let okay = false;
                     if (types.size == 0) {
-                        let chandle = dhandle.writeDataSet(String(i), "Uint8", [ 0 ], new Uint8Array);
+                        let chandle = dhandle.createDataSet(iname, "Uint8", [ df.numberOfRows() ], { data: new Uint8Array(df.numberOfRows()) });
                         handle_stack.push(chandle);
                         chandle.writeAttribute("type", "String", [], [ "boolean" ]);
                         chandle.close();
@@ -319,7 +336,7 @@ async function saveDataFrame(x, path, globals, options = {}) {
                             let placeholder = null;
                             if (has_missing) {
                                 col = col.slice();
-                                if (col.some(Number.isNaN)) {
+                                if (!col.some(Number.isNaN)) {
                                     placeholder = Number.NaN;
                                 } else {
                                     for (const candidate of [0, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.MAX_VALUE, -Number.MAX_VALUE, 0 ]) {
@@ -352,10 +369,11 @@ async function saveDataFrame(x, path, globals, options = {}) {
                                 }
                             }
 
-                            let chandle = dhandle.writeDataSet(String(i), "Float64", [ col.length ], col);
+                            let chandle = dhandle.createDataSet(iname, "Float64", [ col.length ], { data: col });
                             handle_stack.push(chandle);
+                            chandle.writeAttribute("type", "String", [], ["number"]);
                             if (has_missing) {
-                                chandle.writeAttribute("type", "Float64", [], [placeholder]);
+                                chandle.writeAttribute("missing-value-placeholder", "Float64", [], [ placeholder ]);
                             }
                             chandle.close();
                             handle_stack.pop();
@@ -363,7 +381,7 @@ async function saveDataFrame(x, path, globals, options = {}) {
 
                         } else if (types.has("boolean")) {
                             let vals = new Uint8Array(col.length);
-                            for (var i = 0; i < col.length; i++) {
+                            for (let i = 0; i < col.length; i++) {
                                 if (col[i] == null) {
                                     vals[i] = 2;
                                 } else {
@@ -371,10 +389,11 @@ async function saveDataFrame(x, path, globals, options = {}) {
                                 }
                             }
 
-                            let chandle = dhandle.writeDataSet(String(i), "Uint8", [ col.length ], new Uint8Array(col));
+                            let chandle = dhandle.createDataSet(iname, "Uint8", [ col.length ], { data: vals });
                             handle_stack.push(chandle);
+                            chandle.writeAttribute("type", "String", [], ["boolean"]);
                             if (has_missing) {
-                                chandle.writeAttribute("type", "Uint8", [], [2]);
+                                chandle.writeAttribute("missing-value-placeholder", "Uint8", [], [ 2 ]);
                             }
                             chandle.close();
                             handle_stack.pop();
@@ -395,36 +414,25 @@ async function saveDataFrame(x, path, globals, options = {}) {
                                 }
                             }
 
-                            // Choose whether we want fixed-length strings or VLS.
-                            let max_len = 0;
-                            let sum_len = 0;
-                            let encoded = Array(col.length);
-
-                            for (const s of col) {
-                                sum_len += s.length; // don't bother getting byte length, for brevity.
-                                max_len = Math.max(max_len, s.length);
+                            // Not saving as VLS for simplicity.
+                            let chandle = dhandle.createDataSet(iname, "String", [ col.length ], { data: col });
+                            handle_stack.push(chandle);
+                            chandle.writeAttribute("type", "String", [], ["string"]);
+                            if (has_missing) {
+                                chandle.writeAttribute("missing-value-placeholder", "String", [], [ placeholder ]);
                             }
-                            if (max_len * col.length > sum_len + 2 * 8 * col.length) { // i.e., size of two offsets in the heap.
-                                // TODO: provide VLS support here!
-                            } else {
-                                let chandle = dhandle.writeDataSet(String(i), "String", [ col.length ], col);
-                                handle_stack.push(chandle);
-                                if (has_missing) {
-                                    chandle.writeAttribute("type", "String", [], [placeholder]);
-                                }
-                                chandle.close();
-                                handle_stack.pop();
-                                okay = true;
-                            }
+                            chandle.close();
+                            handle_stack.pop();
+                            okay = true;
                         }
                     }
 
                     if (!okay) {
-                        externals["iname"] = col;
+                        externals[iname] = col;
                     }
 
                 } else {
-                    externals["iname"] = col;
+                    externals[iname] = col;
                 }
             }
 
@@ -434,12 +442,16 @@ async function saveDataFrame(x, path, globals, options = {}) {
             }
         }
 
-        for (const [iname, col] of Object.entries(externals)) {
-            saveObject(path + "/other_contents/" + iname, col, globals, options);
+        let external_array = Object.entries(externals);
+        if (external_array.length > 0) {
+            globals.fs.mkdir(path + "/other_columns");
+            for (const [iname, col] of external_array) {
+                saveObject(col, path + "/other_columns/" + iname, globals, options);
+            }
         }
 
     } catch(e) {
-        globals.navigator.delete(path);
+        globals.fs.delete(path);
         throw e;
     }
 }
