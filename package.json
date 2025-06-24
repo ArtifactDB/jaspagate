@@ -21,8 +21,8 @@
   },
   "devDependencies": {
     "docdash": "^2.0.1",
-    "jest": "^27.5.1",
+    "jest": "^30.0.1",
     "jsdoc": "^4.0.1",
-    "wasmarrays.js": "^0.1.0"
+    "h5wasm": "^0.8.1"
   }
 }

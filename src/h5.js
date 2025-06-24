@@ -3,12 +3,6 @@
  * This is an abstract interface that should not be created directly.
  */
 export class H5Group {
-    constructor() {
-        if (this.constructor == H5Group) {
-            throw new Error("cannot instantiate the abstract jaspilite.H5Group class");
-        }
-    }
-
     /**
      * @member {Array}
      * @desc Array containing the names of all attributes of this object.
@@ -20,7 +14,6 @@ export class H5Group {
     /**
      * @param {string} attr - Name of the attribute.
      * @return {object} Object containing the attribute `values` and the `shape` of the attribute.
-     * For HDF5 enums, an additional `level` property is present, containing the levels indexed by the integer `values`.
      */
     readAttribute(attr) {
         throw new Error("'readAttribute()' is not implemented in this H5Group subclass");
@@ -105,7 +98,23 @@ export class H5Group {
  * Representation of a dataset inside a HDF5 file.
  * This is an abstract interface that should not be created directly.
  */
-export class H5DataSet extends H5Base {
+export class H5DataSet {
+    /**
+     * @member {Array}
+     * @desc Array containing the names of all attributes of this object.
+     */
+    attributes() {
+        throw new Error("'attributes()' is not implemented in this H5Group subclass");
+    }
+
+    /**
+     * @param {string} attr - Name of the attribute.
+     * @return {object} Object containing the attribute `values` and the `shape` of the attribute.
+     */
+    readAttribute(attr) {
+        throw new Error("'readAttribute()' is not implemented in this H5Group subclass");
+    }
+
     /**
      * @member {object}
      * @desc String containing the type of the dataset.
@@ -132,17 +141,8 @@ export class H5DataSet extends H5Base {
      * This has length equal to the product of {@linkcode H5DataSet#shape shape};
      * unless this dataset is scalar, in which case it has length 1.
      */
-    values() {
+    value() {
         throw new Error("'values()' is not implemented in this H5DataSet subclass");
-    }
-
-    /**
-     * @member {?Array}
-     * @desc Levels of a HDF5 enum, to be indexed by the integer `values`.
-     * For non-enum data, this is set to `null`.
-     */
-    levels() {
-        throw new Error("'levels()' is not implemented in this H5DataSet subclass");
     }
 
     /**
