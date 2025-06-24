@@ -1,0 +1,28 @@
+{
+  "name": "jaspilite",
+  "version": "0.1.0",
+  "description": "Read and save objects in the takane format. This is a Javascript equivalent to the alabaster (R) and dolomite (Python) frameworks.",
+  "author": {
+    "name": "Aaron Lun",
+    "email": "infinite.monkeys.with.keyboards@gmail.com"
+  },
+  "license": "MIT",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "NODE_OPTIONS='--experimental-vm-modules' npx jest --testTimeout=1000000 --runInBand",
+    "jsdoc": "npx jsdoc -r src README.md -d docs/built -c docs/jsdoc.config.json"
+  },
+  "repository": "https://github.com/ArtifactDB/jaspilite",
+  "homepage": "https://github.com/ArtifactDB/jaspilite",
+  "bugs": "https://github.com/ArtifactDB/jaspilite/issues",
+  "dependencies": {
+    "bioconductor": "^0.3.1"
+  },
+  "devDependencies": {
+    "docdash": "^2.0.1",
+    "jest": "^27.5.1",
+    "jsdoc": "^4.0.1",
+    "wasmarrays.js": "^0.1.0"
+  }
+}
