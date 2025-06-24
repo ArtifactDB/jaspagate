@@ -336,7 +336,7 @@ export async function saveDataFrame(x, path, globals, options = {}) {
                             let placeholder = null;
                             if (has_missing) {
                                 col = col.slice();
-                                if (col.some(Number.isNaN)) {
+                                if (!col.some(Number.isNaN)) {
                                     placeholder = Number.NaN;
                                 } else {
                                     for (const candidate of [0, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.MAX_VALUE, -Number.MAX_VALUE, 0 ]) {
@@ -373,7 +373,7 @@ export async function saveDataFrame(x, path, globals, options = {}) {
                             handle_stack.push(chandle);
                             chandle.writeAttribute("type", "String", [], ["number"]);
                             if (has_missing) {
-                                chandle.writeAttribute("type", "Float64", [], [ placeholder ]);
+                                chandle.writeAttribute("missing-value-placeholder", "Float64", [], [ placeholder ]);
                             }
                             chandle.close();
                             handle_stack.pop();
@@ -389,11 +389,11 @@ export async function saveDataFrame(x, path, globals, options = {}) {
                                 }
                             }
 
-                            let chandle = dhandle.createDataSet(iname, "Uint8", [ col.length ], { data: new Uint8Array(col) });
+                            let chandle = dhandle.createDataSet(iname, "Uint8", [ col.length ], { data: vals });
                             handle_stack.push(chandle);
                             chandle.writeAttribute("type", "String", [], ["boolean"]);
                             if (has_missing) {
-                                chandle.writeAttribute("type", "Uint8", [], [ 2 ]);
+                                chandle.writeAttribute("missing-value-placeholder", "Uint8", [], [ 2 ]);
                             }
                             chandle.close();
                             handle_stack.pop();
@@ -419,7 +419,7 @@ export async function saveDataFrame(x, path, globals, options = {}) {
                             handle_stack.push(chandle);
                             chandle.writeAttribute("type", "String", [], ["string"]);
                             if (has_missing) {
-                                chandle.writeAttribute("type", "String", [], [ placeholder ]);
+                                chandle.writeAttribute("missing-value-placeholder", "String", [], [ placeholder ]);
                             }
                             chandle.close();
                             handle_stack.pop();
@@ -442,8 +442,12 @@ export async function saveDataFrame(x, path, globals, options = {}) {
             }
         }
 
-        for (const [iname, col] of Object.entries(externals)) {
-            saveObject(path + "/other_columns/" + iname, col, globals, options);
+        let external_array = Object.entries(externals);
+        if (external_array.length > 0) {
+            globals.fs.mkdir(path + "/other_columns");
+            for (const [iname, col] of external_array) {
+                saveObject(col, path + "/other_columns/" + iname, globals, options);
+            }
         }
 
     } catch(e) {
