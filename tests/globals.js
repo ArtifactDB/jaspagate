@@ -11,13 +11,10 @@ export const test_globals = {
                 return new Uint8Array(fs.readFileSync(path, null));
             }
         },
+        write: (path, contents) => fs.writeFileSync(path, contents),
         clean: () => {}, // no-op
-        mkdir: path => {
-            fs.mkdirSync(path);
-        },
-        delete: path => {
-            fs.rmSync(path, { recursive: true, force: true });
-        }
+        mkdir: path => fs.mkdirSync(path),
+        delete: path => fs.rmSync(path, { recursive: true, force: true })
     },
     h5: {
         open: async function(path, { readOnly }) {

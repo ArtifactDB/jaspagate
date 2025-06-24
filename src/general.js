@@ -38,10 +38,10 @@ export async function saveObject(x, path, globals, options = {}) {
     }
 
     if (x instanceof bioc.DataFrame) {
-        saveDataFrame(x, path, globals, options);
+        df.saveDataFrame(x, path, globals, options);
         return;
 
     } else {
-        throw new Error("type '" + objtype + "' is not supported");
+        throw new Error("object of type '" + x.constructor.name + "' is not supported");
     }
 }

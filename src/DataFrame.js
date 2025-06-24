@@ -216,80 +216,96 @@ export async function readDataFrame(path, metadata, globals, options = {}) {
 }
 
 export async function saveDataFrame(x, path, globals, options = {}) {
+    await globals.fs.mkdir(path);
     try {
-        await globals.fs.write(path + "/OBJECT", JSON.stringify({ type: "data_frame", version: "1.1" }));
+        await globals.fs.write(path + "/OBJECT", JSON.stringify({ type: "data_frame", data_frame: { version: "1.1" } }));
 
         let externals = {};
         let handle_stack = [];
         try {
-            let fhandle = await globals.h5.open(path + "/basic_contents.h5", { readOnly: false });
+            let fhandle = await globals.h5.open(path + "/basic_columns.h5", { readOnly: false });
             handle_stack.push(fhandle);
 
-            let ghandle = handle.createGroup("data_frame");
+            let ghandle = fhandle.createGroup("data_frame");
             handle_stack.push(ghandle);
             ghandle.writeAttribute("row-count", "Uint64", [], [x.numberOfRows()]);
-            ghandle.writeDataSet("column_names", "String", [ x.numberOfColumns() ], x.columnNames()).close();
+            ghandle.createDataSet("column_names", "String", [ x.numberOfColumns() ], { data: x.columnNames(), returnHandle: false });
             if (x.rowNames() != null) {
-                ghandle.writeDataSet("row_names", "String", [ x.numberOfRows() ], x.rowNames()).close();
+                ghandle.createDataSet("row_names", "String", [ x.numberOfRows() ], { data: x.rowNames(), returnHandle: false });
             }
 
             let dhandle = ghandle.createGroup("data");
             for (const [i, k] of Object.entries(x.columnNames())) {
-                let col = x.column(i);
+                let iname = String(i);
+                let col = x.column(k);
 
                 if (col instanceof Uint8Array) {
-                    let chandle = dhandle.writeDataSet(String(i), "Uint8", [ col.length ], col);
+                    let chandle = dhandle.createDataSet(iname, "Uint8", [ col.length ], { data: col });
                     handle_stack.push(chandle);
                     chandle.writeAttribute("type", "String", [], ["integer"]);
                     chandle.close();
                     handle_stack.pop();
 
                 } else if (col instanceof Int8Array) {
-                    let chandle = dhandle.writeDataSet(String(i), "Int8", [ col.length ], col);
+                    let chandle = dhandle.createDataSet(iname, "Int8", [ col.length ], { data: col });
                     handle_stack.push(chandle);
                     chandle.writeAttribute("type", "String", [], ["integer"]);
                     chandle.close();
                     handle_stack.pop();
 
                 } else if (col instanceof Uint16Array) {
-                    let chandle = dhandle.writeDataSet(String(i), "Uint16", [ col.length ], col);
+                    let chandle = dhandle.createDataSet(iname, "Uint16", [ col.length ], { data: col });
                     handle_stack.push(chandle);
                     chandle.writeAttribute("type", "String", [], ["integer"]);
                     chandle.close();
                     handle_stack.pop();
 
                 } else if (col instanceof Int16Array) {
-                    let chandle = dhandle.writeDataSet(String(i), "Int16", [ col.length ], col);
+                    let chandle = dhandle.createDataSet(iname, "Int16", [ col.length ], { data: col });
                     handle_stack.push(chandle);
                     chandle.writeAttribute("type", "String", [], ["integer"]);
                     chandle.close();
                     handle_stack.pop();
 
                 } else if (col instanceof Uint32Array) {
-                    let chandle = dhandle.writeDataSet(String(i), "Uint32", [ col.length ], col);
+                    let chandle = dhandle.createDataSet(iname, "Uint32", [ col.length ], { data: col });
                     handle_stack.push(chandle);
                     chandle.writeAttribute("type", "String", [], ["number"]); // only up to int32 is supported by 'integer'.
                     chandle.close();
                     handle_stack.pop();
 
                 } else if (col instanceof Int32Array) {
-                    let chandle = dhandle.writeDataSet(String(i), "Int32", [ col.length ], col);
+                    let chandle = dhandle.createDataSet(iname, "Int32", [ col.length ], { data: col });
                     handle_stack.push(chandle);
                     chandle.writeAttribute("type", "String", [], ["integer"]);
                     chandle.close();
                     handle_stack.pop();
 
-                } else if (col instanceof Uint64Array) {
-                    let chandle = dhandle.writeDataSet(String(i), "Float64", [ col.length ], col);
+                } else if (col instanceof BigUint64Array) {
+                    let chandle = dhandle.createDataSet(iname, "Float64", [ col.length ], { data: col });
                     handle_stack.push(chandle);
                     chandle.writeAttribute("type", "String", [], ["number"]); // only up to int32 is supported by 'integer'.
                     chandle.close();
                     handle_stack.pop();
 
-                } else if (col instanceof Int64Array) {
-                    let chandle = dhandle.writeDataSet(String(i), "Float64", [ col.length ], col);
+                } else if (col instanceof BigInt64Array) {
+                    let chandle = dhandle.createDataSet(iname, "Float64", [ col.length ], { data: col });
                     handle_stack.push(chandle);
                     chandle.writeAttribute("type", "String", [], ["number"]); // only up to int32 is supported by 'integer'.
+                    chandle.close();
+                    handle_stack.pop();
+
+                } else if (col instanceof Float32Array) {
+                    let chandle = dhandle.createDataSet(iname, "Float32", [ col.length ], { data: col });
+                    handle_stack.push(chandle);
+                    chandle.writeAttribute("type", "String", [], ["number"]);
+                    chandle.close();
+                    handle_stack.pop();
+
+                } else if (col instanceof Float64Array) {
+                    let chandle = dhandle.createDataSet(iname, "Float64", [ col.length ], { data: col });
+                    handle_stack.push(chandle);
+                    chandle.writeAttribute("type", "String", [], ["number"]);
                     chandle.close();
                     handle_stack.pop();
 
@@ -307,7 +323,7 @@ export async function saveDataFrame(x, path, globals, options = {}) {
 
                     let okay = false;
                     if (types.size == 0) {
-                        let chandle = dhandle.writeDataSet(String(i), "Uint8", [ 0 ], new Uint8Array);
+                        let chandle = dhandle.createDataSet(iname, "Uint8", [ df.numberOfRows() ], { data: new Uint8Array(df.numberOfRows()) });
                         handle_stack.push(chandle);
                         chandle.writeAttribute("type", "String", [], [ "boolean" ]);
                         chandle.close();
@@ -353,10 +369,11 @@ export async function saveDataFrame(x, path, globals, options = {}) {
                                 }
                             }
 
-                            let chandle = dhandle.writeDataSet(String(i), "Float64", [ col.length ], col);
+                            let chandle = dhandle.createDataSet(iname, "Float64", [ col.length ], { data: col });
                             handle_stack.push(chandle);
+                            chandle.writeAttribute("type", "String", [], ["number"]);
                             if (has_missing) {
-                                chandle.writeAttribute("type", "Float64", [], [placeholder]);
+                                chandle.writeAttribute("type", "Float64", [], [ placeholder ]);
                             }
                             chandle.close();
                             handle_stack.pop();
@@ -372,10 +389,11 @@ export async function saveDataFrame(x, path, globals, options = {}) {
                                 }
                             }
 
-                            let chandle = dhandle.writeDataSet(String(i), "Uint8", [ col.length ], new Uint8Array(col));
+                            let chandle = dhandle.createDataSet(iname, "Uint8", [ col.length ], { data: new Uint8Array(col) });
                             handle_stack.push(chandle);
+                            chandle.writeAttribute("type", "String", [], ["boolean"]);
                             if (has_missing) {
-                                chandle.writeAttribute("type", "Uint8", [], [2]);
+                                chandle.writeAttribute("type", "Uint8", [], [ 2 ]);
                             }
                             chandle.close();
                             handle_stack.pop();
@@ -396,36 +414,25 @@ export async function saveDataFrame(x, path, globals, options = {}) {
                                 }
                             }
 
-                            // Choose whether we want fixed-length strings or VLS.
-                            let max_len = 0;
-                            let sum_len = 0;
-                            let encoded = Array(col.length);
-
-                            for (const s of col) {
-                                sum_len += s.length; // don't bother getting byte length, for brevity.
-                                max_len = Math.max(max_len, s.length);
+                            // Not saving as VLS for simplicity.
+                            let chandle = dhandle.createDataSet(iname, "String", [ col.length ], { data: col });
+                            handle_stack.push(chandle);
+                            chandle.writeAttribute("type", "String", [], ["string"]);
+                            if (has_missing) {
+                                chandle.writeAttribute("type", "String", [], [ placeholder ]);
                             }
-                            if (max_len * col.length > sum_len + 2 * 8 * col.length) { // i.e., size of two offsets in the heap.
-                                // TODO: provide VLS support here!
-                            } else {
-                                let chandle = dhandle.writeDataSet(String(i), "String", [ col.length ], col);
-                                handle_stack.push(chandle);
-                                if (has_missing) {
-                                    chandle.writeAttribute("type", "String", [], [placeholder]);
-                                }
-                                chandle.close();
-                                handle_stack.pop();
-                                okay = true;
-                            }
+                            chandle.close();
+                            handle_stack.pop();
+                            okay = true;
                         }
                     }
 
                     if (!okay) {
-                        externals["iname"] = col;
+                        externals[iname] = col;
                     }
 
                 } else {
-                    externals["iname"] = col;
+                    externals[iname] = col;
                 }
             }
 
@@ -436,7 +443,7 @@ export async function saveDataFrame(x, path, globals, options = {}) {
         }
 
         for (const [iname, col] of Object.entries(externals)) {
-            saveObject(path + "/other_contents/" + iname, col, globals, options);
+            saveObject(path + "/other_columns/" + iname, col, globals, options);
         }
 
     } catch(e) {
