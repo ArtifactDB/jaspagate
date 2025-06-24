@@ -12,9 +12,8 @@ export const test_globals = {
             }
         },
         write: (path, contents) => fs.writeFileSync(path, contents),
-        clean: () => {}, // no-op
-        mkdir: path => fs.mkdirSync(path),
-        delete: path => fs.rmSync(path, { recursive: true, force: true })
+        clean: (path) => {}, // no-op
+        mkdir: path => fs.mkdirSync(path)
     },
     h5: {
         open: async function(path, { readOnly }) {

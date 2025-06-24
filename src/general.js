@@ -1,22 +1,46 @@
 import * as bioc from "bioconductor";
 import * as df from "./DataFrame.js";
 
+/**
+ * @param {string} path - Path to the takane-formatted object directory containing the {@link DataFrame}.
+ * @param {object} globals - Object containing `fs`, an object satisfying the {@link GlobalFsInterface}. 
+ * @return {object} Object metadata.
+ * @async
+ */
 export async function readObjectFile(path, globals) {
     let payload = await globals.fs.get(path + "/OBJECT", { asBuffer: true });
     let dec = new TextDecoder;
     return JSON.parse(dec.decode(payload));
 }
 
-export const readObject_registry = {};
+/**
+ * @type {object}
+ * @desc Registry of reader functions.
+ * Each key is a takane object type, and each value is a function that accepts the same arguments as {@linkcode readObject}.
+ */
+export const readObjectRegistry = {};
 
+/**
+ * This function will inspect {@linkcode readObjectRegistry} to check if any reader function is supplied for the takane object type at `path`.
+ * If found, it will use that function, otherwise it will fall back to the default functions.
+ *
+ * @param {string} path - Path to a takane-formatted object directory. 
+ * @param {?object} metadata - Object metadata.
+ * If `null`, this is automatically loaded by calling {@linkcode readObjectFile} on `path`.
+ * @param {object} globals - Object containing `fs`, an object satisfying the {@link GlobalFsInterface}; and `h5`, an object satisfying the {@link GlobalH5Interface}.
+ * @param {object} [options={}] - Further options, to be passed to the reader functions for individual takane object types.
+ *
+ * @return Some in-memory representation of the takane object at `path`.
+ * @async
+ */
 export async function readObject(path, metadata, globals, options = {}) {
     if (metadata == null) {
         metadata = await readObjectFile(path, globals);
     }
 
     let objtype = metadata["type"];
-    if (objtype in readObject_registry) {
-        return readObject_registry[objtype](path, metadata, globals, options);
+    if (objtype in readObjectRegistry) {
+        return readObjectRegistry[objtype](path, metadata, globals, options);
 
     } else if (objtype == "data_frame") { 
         return df.readDataFrame(path, metadata, globals, options);
@@ -26,11 +50,27 @@ export async function readObject(path, metadata, globals, options = {}) {
     }
 }
 
-export const saveObject_registry = [];
+/**
+ * @type {Array}
+ * @desc Registry of saving functions.
+ * Each entry should be an array of length 2, containing a Javascript class and its saving function.
+ * Each saving function should accept the same arguments as {@linkcode saveObject}.
+ * Subclasses should be placed after their parents in this array.
+ */
+export const saveObjectRegistry = [];
 
+/**
+ * @param {Any} x - The takane-compatible object to be saved.
+ * @param {string} path - Path to the directory in which to save `x`.
+ * @param {object} globals - Object containing `fs`, an object satisfying the {@link GlobalFsInterface}; and `h5`, an object satisfying the {@link GlobalH5Interface}.
+ * @param {object} [options={}] - Further options.
+ *
+ * @return `x` is stored at `path`.
+ * @async
+ */
 export async function saveObject(x, path, globals, options = {}) {
-    for (var i = saveObject_registry.length; i > 0; i--) {
-        const [cls, meth] = saveObject_registry[i - 1];
+    for (var i = saveObjectRegistry.length; i > 0; i--) {
+        const [cls, meth] = saveObjectRegistry[i - 1];
         if (x instanceof cls) {
             meth(x, path, globals, options);
             return;

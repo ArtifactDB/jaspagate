@@ -1,6 +1,7 @@
 /**
  * Representation of a group inside a HDF5 file.
  * This is an abstract interface that should not be created directly.
+ * @hideconstructor
  */
 export class H5Group {
     /**
@@ -13,36 +14,35 @@ export class H5Group {
 
     /**
      * @param {string} attr - Name of the attribute.
-     * @return {object} Object containing the attribute `values` and the `shape` of the attribute.
+     * @return {object} Object containing:
+     * - `values`, an Array or TypedArray containing the attribute data.
+     *   This should have length equal to the product of `shape` for non-scalar attributes.
+     * - `shape`, an Array containing the dimensions of the attribute.
+     *   This is empty for scalar attributes, in which case `values` will have length 1.
      */
     readAttribute(attr) {
         throw new Error("'readAttribute()' is not implemented in this H5Group subclass");
     }
 
     /**
-     * Write an attribute for the object.
-     *
      * @param {string} attr - Name of the attribute.
-     * @param {string} type - Type of dataset to create.
+     * @param {string} type - Type of attribute to create.
      * This can be `"IntX"` or `"UintX"` for `X` of 8, 16, 32, or 64; or `"FloatX"` for `X` of 32 or 64; or `"String"`.
-     * Alternatively, it may be an object specifying a compound datatype, where each key is the name and each value is a string as described above.
-     * @param {?Array} shape - Array containing the dimensions of the dataset to create.
+     * @param {?Array} shape - Array containing the dimensions of the attribute to create.
      * If set to an empty array, this will create a scalar dataset.
-     * If set to `null`, this is determined from `x`.
-     * @param {(TypedArray|Array|string|number)} x - Values to be written to the new dataset, see {@linkcode H5DataSet#write write}.
+     * @param {TypedArray|Array} x - Values to be written to the new attribute.
      * This should be of length equal to the product of `shape` - unless `shape` is empty, in which case it should be of length 1.
      * @param {object} [options={}] - Optional parameters.
      * @param {?number} [options.maxStringLength=null] - Maximum length of the strings to be saved.
      * Only used when `type = "String"`.
-     * If `null`, this is inferred from the maximum length of strings in `x`.
+     * If `null`, this is inferred from the maximum length of strings in `data`.
      */
-    writeAttribute(attr, type, shape, data, options = {}) {
+    writeAttribute(attr, type, shape, data, options = { maxStringLength: null }) {
         throw new Error("'writeAttribute()' is not implemented in this H5Group subclass");
     }
 
     /**
-     * @desc An object where the keys are the names of the immediate children and the values are strings specifying the object type of each child.
-     * Each string can be one of `"Group"`, `"DataSet"` or `"Other"`.
+     * @return {Array} Names of the children of this group.
      */
     children() {
         throw new Error("'children()' is not implemented in this H5Group subclass");
@@ -50,11 +50,9 @@ export class H5Group {
 
     /**
      * @param {string} name - Name of the child element to open.
-     * @param {object} [options={}] - Further options to pass to the {@linkplain H5Group} or {@linkplain H5DataSet} constructors.
-     *
      * @return {H5Group|H5DataSet} Object representing the child element.
      */
-    open(name, options = {}) {
+    open(name) {
         throw new Error("'open()' is not implemented in this H5Group subclass");
     }
 
@@ -73,28 +71,36 @@ export class H5Group {
      * @param {string} name - Name of the dataset to create.
      * @param {string|object} type - Type of dataset to create.
      * This can be `"IntX"` or `"UintX"` for `X` of 8, 16, 32, or 64; or `"FloatX"` for `X` of 32 or 64; or `"String"`.
-     * Alternatively, it may be an object specifying a compound datatype, where each key is the name and each value is a string as described above.
      * @param {Array} shape - Array containing the dimensions of the dataset to create.
      * This can be set to an empty array to create a scalar dataset.
      * @param {object} [options={}] - Optional parameters.
      * @param {number} [options.maxStringLength=null] - Maximum length of the strings to be saved.
      * Only used when `type = "String"`.
      * If `null`, this should be inferred from the maximum length of strings in `options.data`.
-     * If `options.data` is `null`, this must be provided.
+     * If `options.data` is `null`, this must be provided for `type = "String"`.
      * @param {?(Array|TypedArray)} [options.data=null] - Array to be written to the dataset.
-     * This is equivalent to calling {@link H5DataSet#write H5DataSet.write} immediately after the dataset is created.
+     * This is equivalent to calling {@linkcode H5DataSet#write H5DataSet.write} immediately after the dataset is created.
      *
      * @return {H5DataSet} A dataset of the specified type and shape is created as an immediate child of the current group.
      * A {@linkplain H5DataSet} object is returned representing this new dataset.
      */
-    createDataSet(name, type, shape, options = {}) {
+    createDataSet(name, type, shape, options = { maxStringLength: null, data: null }) {
         throw new Error("'createDataSet()' is not implemented in this H5Group subclass");
+    }
+
+    /**
+     * @return Closes the group handle.
+     * Any subsequent method invocations on this group or its children are considered invalid.
+     */
+    close() {
+        throw new Error("'close()' is not implemented in this H5Group subclass");
     }
 }
 
 /**
  * Representation of a dataset inside a HDF5 file.
  * This is an abstract interface that should not be created directly.
+ * @hideconstructor
  */
 export class H5DataSet {
     /**
@@ -107,26 +113,27 @@ export class H5DataSet {
 
     /**
      * @param {string} attr - Name of the attribute.
-     * @return {object} Object containing the attribute `values` and the `shape` of the attribute.
+     * @return {object} Object containing:
+     * - `values`, an Array or TypedArray containing the attribute data.
+     *   This should have length equal to the product of `shape` for non-scalar attributes.
+     * - `shape`, an Array containing the dimensions of the attribute.
+     *   This is empty for scalar attributes, in which case `values` will have length 1.
      */
     readAttribute(attr) {
         throw new Error("'readAttribute()' is not implemented in this H5Group subclass");
     }
 
     /**
-     * @member {object}
-     * @desc String containing the type of the dataset.
-     * This may be `"IntX"` or `"UintX"` for `X` of 8, 16, 32, or 64;
-     * or `"FloatX"` for `X` of 32 or 64;
-     * or `"String"`.
+     * @return {string|object} String containing the type of the dataset.
+     * This may be `"IntX"` or `"UintX"` for `X` of 8, 16, 32, or 64; or `"FloatX"` for `X` of 32 or 64; or `"String"`.
+     * Alternatively, this may be an object representing a compound dataype, where keys and values are the names and types of each component.
      */
     type() {
         throw new Error("'type()' is not implemented in this H5DataSet subclass");
     }
 
     /**
-     * @member {Array}
-     * @desc Array of integers containing the dimensions of the dataset.
+     * @return {Array} Array of integers containing the dimensions of the dataset.
      * If this is an empty array, the dataset is a scalar.
      */
     shape() {
@@ -134,25 +141,30 @@ export class H5DataSet {
     }
 
     /**
-     * @member {(Array|TypedArray)}
-     * @desc The contents of this dataset.
-     * This has length equal to the product of {@linkcode H5DataSet#shape shape};
-     * unless this dataset is scalar, in which case it has length 1.
+     * @return {Array|TypedArray} The contents of this dataset.
+     * This has length equal to the product of {@linkcode H5DataSet#shape shape} - unless this dataset is scalar, in which case it has length 1.
+     * For compound datatypes, each element of the output array is an object.
      */
-    value() {
+    values() {
         throw new Error("'values()' is not implemented in this H5DataSet subclass");
     }
 
     /**
-     * @param {Array|TypedArray|number|string} x - Values to write to the dataset.
+     * @param {Array|TypedArray} x - Values to write to the dataset.
      * This should be of length equal to the product of {@linkcode H5DataSet#shape shape} -  unless `shape` is empty, in which case it should be of length 1.
-     * @param {object} [options={}] - Optional parameters.
-     * @param {boolean} [options.cache=false] - Whether to cache the written values in this {@linkplain H5DataSet} object.
      *
      * @return `x` is written to the dataset on file.
      * No return value is provided.
      */
     write(x, options = {}) {
         throw new Error("'write()' is not implemented in this H5DataSet subclass");
+    }
+
+    /**
+     * @return Closes the dataset handle.
+     * Any subsequent method invocations on this dataset need not be valid.
+     */
+    close() {
+        throw new Error("'close()' is not implemented in this H5DataSet subclass");
     }
 }
