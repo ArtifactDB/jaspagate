@@ -84,11 +84,17 @@ export async function saveObject(x, path, globals, options = {}) {
         }
     }
 
-    if (x instanceof bioc.DataFrame) {
-        df.saveDataFrame(x, path, globals, options);
-        return;
+    const defaults = [
+        [bioc.SummarizedExperiment, se.saveSummarizedExperiment],
+        [bioc.DataFrame, df.saveDataFrame]
+    ];
 
-    } else {
-        throw new Error("object of type '" + x.constructor.name + "' is not supported");
+    for (const [cls, fun] of defaults) {
+        if (x instanceof cls) {
+            fun(x, path, globals, options);
+            return;
+        }
     }
+
+    throw new Error("object of type '" + x.constructor.name + "' is not supported");
 }

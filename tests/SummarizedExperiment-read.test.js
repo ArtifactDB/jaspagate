@@ -1,6 +1,6 @@
 import * as bioc from "bioconductor";
 import { test_globals } from "./globals.js";
-import * as misc from "./misc.js";
+import * as misc from "./matrix.js";
 import * as jsp from "../src/index.js";
 
 test("readSummarizedExperiment with full contents", async () => {
