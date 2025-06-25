@@ -1,5 +1,6 @@
 import * as bioc from "bioconductor";
 import * as df from "./DataFrame.js";
+import * as se from "./SummarizedExperiment.js";
 
 /**
  * @param {string} path - Path to the takane-formatted object directory containing the {@link DataFrame}.
@@ -42,10 +43,16 @@ export async function readObject(path, metadata, globals, options = {}) {
     if (objtype in readObjectRegistry) {
         return readObjectRegistry[objtype](path, metadata, globals, options);
 
-    } else if (objtype == "data_frame") { 
-        return df.readDataFrame(path, metadata, globals, options);
-
     } else {
+        const defaults = {
+            "data_frame": df.readDataFrame,
+            "summarized_experiment": se.readSummarizedExperiment
+        };
+
+        if (objtype in defaults) {
+            return defaults[objtype](path, metadata, globals, options);
+        }
+
         throw new Error("type '" + objtype + "' is not supported");
     }
 }

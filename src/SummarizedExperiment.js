@@ -1,4 +1,4 @@
-import { SummarizedExperiment } from "bioconductor";
+import { DataFrame, SummarizedExperiment } from "bioconductor";
 import { H5Group, H5DataSet } from "./h5.js";
 import { readObject, saveObject } from "./general.js";
 
@@ -23,23 +23,31 @@ export async function readSummarizedExperiment(path, metadata, globals, options 
 
     const se_options = {};
     const assays = {};
-    if (await globals.exists(path + "/assays/names.json")) {
-        se_options.assayOrder = await globals.fs.get(path + "/assays/names.json", { asBuffer: true });
-        for (const [i, aname] of Object.entries(se_options.assayOrder)) {
+    if (await globals.fs.exists(path + "/assays/names.json")) {
+        let names_contents = await globals.fs.get(path + "/assays/names.json", { asBuffer: true });
+        const dec = new TextDecoder;
+        const assay_names = JSON.parse(dec.decode(names_contents));
+
+        se_options.assayOrder = assay_names;
+        for (const [i, aname] of Object.entries(assay_names)) {
             assays[aname] = await readObject(path + "/assays/" + String(i), null, globals, options);
         }
     }
 
-    if (await globals.exists(path + "/column_data/OBJECT")) {
+    if (await globals.fs.exists(path + "/column_data/OBJECT")) {
         let cd = await readObject(path + "/column_data", null, globals, options);
         se_options.columnData = cd;
         se_options.columnNames = cd.rowNames();
+    } else if (Object.keys(assays).length == 0) {
+        se_options.columnData = new DataFrame({}, { numberOfRows: 0 });
     }
 
-    if (await globals.exists(path + "/row_data/OBJECT")) {
+    if (await globals.fs.exists(path + "/row_data/OBJECT")) {
         let cd = await readObject(path + "/row_data", null, globals, options);
         se_options.rowData = cd;
         se_options.rowNames = cd.rowNames();
+    } else if (Object.keys(assays).length == 0) {
+        se_options.rowData = new DataFrame({}, { numberOfRows: 0 });
     }
 
     return new SummarizedExperiment(assays, se_options);
