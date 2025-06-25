@@ -1,5 +1,6 @@
 import * as bioc from "bioconductor";
 import * as df from "./DataFrame.js";
+import * as se from "./SummarizedExperiment.js";
 
 /**
  * @param {string} path - Path to the takane-formatted object directory containing the {@link DataFrame}.
@@ -42,10 +43,16 @@ export async function readObject(path, metadata, globals, options = {}) {
     if (objtype in readObjectRegistry) {
         return readObjectRegistry[objtype](path, metadata, globals, options);
 
-    } else if (objtype == "data_frame") { 
-        return df.readDataFrame(path, metadata, globals, options);
-
     } else {
+        const defaults = {
+            "data_frame": df.readDataFrame,
+            "summarized_experiment": se.readSummarizedExperiment
+        };
+
+        if (objtype in defaults) {
+            return defaults[objtype](path, metadata, globals, options);
+        }
+
         throw new Error("type '" + objtype + "' is not supported");
     }
 }
@@ -77,11 +84,17 @@ export async function saveObject(x, path, globals, options = {}) {
         }
     }
 
-    if (x instanceof bioc.DataFrame) {
-        df.saveDataFrame(x, path, globals, options);
-        return;
+    const defaults = [
+        [bioc.SummarizedExperiment, se.saveSummarizedExperiment],
+        [bioc.DataFrame, df.saveDataFrame]
+    ];
 
-    } else {
-        throw new Error("object of type '" + x.constructor.name + "' is not supported");
+    for (const [cls, fun] of defaults) {
+        if (x instanceof cls) {
+            fun(x, path, globals, options);
+            return;
+        }
     }
+
+    throw new Error("object of type '" + x.constructor.name + "' is not supported");
 }

@@ -11,6 +11,7 @@ export const test_globals = {
                 return new Uint8Array(fs.readFileSync(path, null));
             }
         },
+        exists: path => fs.existsSync(path),
         write: (path, contents) => fs.writeFileSync(path, contents),
         clean: (path) => {}, // no-op
         mkdir: path => fs.mkdirSync(path)

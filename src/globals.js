@@ -20,6 +20,15 @@ export class GlobalFsInterface {
     /**
      * @param {string} path - Path to the file.
      * This may be relative or absolute, depending on the application.
+     * @return {boolean} Whether the `path` exists.
+     */
+    exists(path) {
+        throw new Error("'exists()' is not implemented in this GlobalFs subclass");
+    }
+
+    /**
+     * @param {string} path - Path to the file.
+     * This may be relative or absolute, depending on the application.
      * @param {Uint8Array} contents - Contents of the file.
      *
      * @return `contents` should be stored at `path`.
