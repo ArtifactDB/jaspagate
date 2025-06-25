@@ -5,7 +5,7 @@ import { readObject, saveObject } from "./general.js";
 /**
  * A data frame of columnar data.
  * @external DataFrame
- * @see {@link https://ltla.github.io/bioconductor}
+ * @see {@link https://ltla.github.io/bioconductor.js/DataFrame.html}
  */
 
 /**
