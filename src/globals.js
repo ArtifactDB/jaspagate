@@ -33,6 +33,7 @@ export class GlobalFsInterface {
      *
      * @return `contents` should be stored at `path`.
      * The exact nature of this storage depends on the application.
+     * If `path` already exists, it should be overwritten with `contents`.
      * No value is returned.
      */
     write(path, contents) {

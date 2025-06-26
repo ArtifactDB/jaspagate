@@ -1,6 +1,7 @@
 import * as bioc from "bioconductor";
 import * as df from "./DataFrame.js";
 import * as se from "./SummarizedExperiment.js";
+import * as sce from "./SingleCellExperiment.js";
 
 /**
  * @param {string} path - Path to the takane-formatted object directory containing the {@link DataFrame}.
@@ -46,7 +47,8 @@ export async function readObject(path, metadata, globals, options = {}) {
     } else {
         const defaults = {
             "data_frame": df.readDataFrame,
-            "summarized_experiment": se.readSummarizedExperiment
+            "summarized_experiment": se.readSummarizedExperiment,
+            "single_cell_experiment": sce.readSingleCellExperiment
         };
 
         if (objtype in defaults) {
@@ -85,6 +87,7 @@ export async function saveObject(x, path, globals, options = {}) {
     }
 
     const defaults = [
+        [bioc.SingleCellExperiment, sce.saveSingleCellExperiment],
         [bioc.SummarizedExperiment, se.saveSummarizedExperiment],
         [bioc.DataFrame, df.saveDataFrame]
     ];
