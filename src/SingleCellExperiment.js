@@ -1,7 +1,7 @@
 import { SingleCellExperiment } from "bioconductor";
 import { H5Group, H5DataSet } from "./h5.js";
 import { readObject, readObjectFile, saveObject } from "./general.js";
-import { readSummarizedExperiment, saveSummarizedExperiment } from "./SummarizedExperiment.js"; 
+import { readRangedSummarizedExperiment, saveRangedSummarizedExperiment } from "./RangedSummarizedExperiment.js"; 
 
 /**
  * A single-cell experiment.
@@ -28,23 +28,24 @@ import { readSummarizedExperiment, saveSummarizedExperiment } from "./Summarized
  * @async
  */
 export async function readSingleCellExperiment(path, metadata, globals, options = {}) {
-    let se = await readSummarizedExperiment(path, metadata, globals, options);
+    let rse = await readRangedSummarizedExperiment(path, metadata, globals, options);
 
     let all_assays = {};
-    const assay_names = se.assayNames();
+    const assay_names = rse.assayNames();
     for (const aname of assay_names) {
-        all_assays[aname] = se.assay(aname);
+        all_assays[aname] = rse.assay(aname);
     }
 
     let sce = new SingleCellExperiment(
         all_assays,
         {
-            assayOrder: se.assayNames(),
-            rowData: se.rowData(),
-            columnData: se.columnData(),
-            rowNames: se.rowNames(),
-            columnNames: se.columnNames(),
-            metadata: se.metadata(),
+            assayOrder: rse.assayNames(),
+            rowRanges: rse.rowRanges(),
+            rowData: rse.rowData(),
+            columnData: rse.columnData(),
+            rowNames: rse.rowNames(),
+            columnNames: rse.columnNames(),
+            metadata: rse.metadata(),
         }
     );
 
@@ -109,13 +110,10 @@ export async function readSingleCellExperiment(path, metadata, globals, options 
  * @async
  */
 export async function saveSingleCellExperiment(x, path, globals, options = {}) {
-    await saveSummarizedExperiment(x, path, globals, options);
+    await saveRangedSummarizedExperiment(x, path, globals, options);
 
-    let object_contents = globals.fs.get(path + "/OBJECT", { asBuffer: true });
-    const dec = new TextDecoder;
-    const existing = JSON.parse(dec.decode(object_contents));
+    const existing = await readObjectFile(path, globals);
     existing.type = "single_cell_experiment";
-    existing.ranged_summarized_experiment = { "version": "1.0" };
     existing.single_cell_experiment = { "version": "1.0" };
     await globals.fs.write(path + "/OBJECT", JSON.stringify(existing));
 

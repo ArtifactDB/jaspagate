@@ -46,8 +46,11 @@ Currently, we only support a small number of **takane** formats.
     in [`readObjectRegistry`](https://artifactdb.github.io/jaspilite/readObjectRegistry) and [`saveObjectRegistry`](https://artifactdb.github.io/jaspilite/saveObjectRegistry).
     This ensures that large datasets are directly converted to application-specific representations for optimal efficiency.
   - Metadata is not loaded or saved.
-- `single_cell_experiment` objects are loaded as [`SingleCellExperiment`](https://ltla.github.io/bioconductor.js/SingleCellExperiment.html) instances, with the following caveats:
+- `ranged_summarized_experiment` objects are loaded as [`RangedSummarizedExperiment`](https://ltla.github.io/bioconductor.js/RangedSummarizedExperiment.html) instances, with the following caveats:
+  - Everything mentioned for `summarized_experiment`.
   - Non-empty row ranges are not loaded or saved.
+- `single_cell_experiment` objects are loaded as [`SingleCellExperiment`](https://ltla.github.io/bioconductor.js/SingleCellExperiment.html) instances, with the following caveats:
+  - Everything mentioned for `ranged_summarized_experiment`.
   - The main experiment name is not loaded or saved.
 
 If you need something for your application, make an [issue](https://github.com/jaspilite/issues) and we'll see what we can do.

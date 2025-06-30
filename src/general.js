@@ -1,6 +1,7 @@
 import * as bioc from "bioconductor";
 import * as df from "./DataFrame.js";
 import * as se from "./SummarizedExperiment.js";
+import * as rse from "./RangedSummarizedExperiment.js";
 import * as sce from "./SingleCellExperiment.js";
 
 /**
@@ -28,6 +29,7 @@ export const readObjectRegistry = {};
  * 
  * - {@linkcode readDataFrame}, to read {@link external:DataFrame DataFrame} objects.
  * - {@linkcode readSummarizedExperiment}, to read {@link external:SummarizedExperiment SummarizedExperiment} objects.
+ * - {@linkcode readRangedSummarizedExperiment}, to read {@link external:RangedSummarizedExperiment RangedSummarizedExperiment} objects.
  * - {@linkcode readSingleCellExperiment}, to read {@link external:SingleCellExperiment SingleCellExperiment} objects.
  *
  * @param {string} path - Path to a takane-formatted object directory. 
@@ -52,6 +54,7 @@ export async function readObject(path, metadata, globals, options = {}) {
         const defaults = {
             "data_frame": df.readDataFrame,
             "summarized_experiment": se.readSummarizedExperiment,
+            "ranged_summarized_experiment": rse.readRangedSummarizedExperiment,
             "single_cell_experiment": sce.readSingleCellExperiment
         };
 
@@ -78,6 +81,7 @@ export const saveObjectRegistry = [];
  * 
  * - {@linkcode saveDataFrame}, to save {@link external:DataFrame DataFrame} objects.
  * - {@linkcode saveSummarizedExperiment}, to save {@link external:SummarizedExperiment SummarizedExperiment} objects.
+ * - {@linkcode saveRangedSummarizedExperiment}, to save {@link external:RangedSummarizedExperiment RangedSummarizedExperiment} objects.
  * - {@linkcode saveSingleCellExperiment}, to save {@link external:SingleCellExperiment SingleCellExperiment} objects.
  *
  * @param {Any} x - The takane-compatible object to be saved.
@@ -99,6 +103,7 @@ export async function saveObject(x, path, globals, options = {}) {
 
     const defaults = [
         [bioc.SingleCellExperiment, sce.saveSingleCellExperiment],
+        [bioc.RangedSummarizedExperiment, rse.saveRangedSummarizedExperiment],
         [bioc.SummarizedExperiment, se.saveSummarizedExperiment],
         [bioc.DataFrame, df.saveDataFrame]
     ];
