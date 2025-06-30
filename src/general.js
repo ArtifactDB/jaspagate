@@ -24,7 +24,11 @@ export const readObjectRegistry = {};
 
 /**
  * This function will inspect {@linkcode readObjectRegistry} to check if any reader function is supplied for the takane object type at `path`.
- * If found, it will use that function, otherwise it will fall back to the default functions.
+ * If found, it will use that function, otherwise it will fall back to the default functions:
+ * 
+ * - {@linkcode readDataFrame}, to read {@link external:DataFrame DataFrame} objects.
+ * - {@linkcode readSummarizedExperiment}, to read {@link external:SummarizedExperiment SummarizedExperiment} objects.
+ * - {@linkcode readSingleCellExperiment}, to read {@link external:SingleCellExperiment SingleCellExperiment} objects.
  *
  * @param {string} path - Path to a takane-formatted object directory. 
  * @param {?object} metadata - Object metadata.
@@ -69,6 +73,13 @@ export async function readObject(path, metadata, globals, options = {}) {
 export const saveObjectRegistry = [];
 
 /**
+ * This function will inspect {@linkcode saveObjectRegistry} to check if any saving function is supplied for `x`.
+ * If found, it will use that function, otherwise it will fall back to the default functions:
+ * 
+ * - {@linkcode saveDataFrame}, to save {@link external:DataFrame DataFrame} objects.
+ * - {@linkcode saveSummarizedExperiment}, to save {@link external:SummarizedExperiment SummarizedExperiment} objects.
+ * - {@linkcode saveSingleCellExperiment}, to save {@link external:SingleCellExperiment SingleCellExperiment} objects.
+ *
  * @param {Any} x - The takane-compatible object to be saved.
  * @param {string} path - Path to the directory in which to save `x`.
  * @param {object} globals - Object containing `fs`, an object satisfying the {@link GlobalFsInterface}; and `h5`, an object satisfying the {@link GlobalH5Interface}.

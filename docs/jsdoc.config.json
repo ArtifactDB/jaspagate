@@ -15,7 +15,7 @@
         "scripts": [],
         "menu": {
             "Code Repo": {
-                "href": "https://github.com/LTLA/bioconductor.js",
+                "href": "https://github.com/ArtifactDB/jaspilite",
                 "target": "_blank",
                 "class": "menu-item",
                 "id": "repository"
