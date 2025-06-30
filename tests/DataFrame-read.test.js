@@ -55,8 +55,20 @@ test("readDataFrame with missing values", async () => {
 
 test("readDataFrame with non-atomic columns", async () => {
     let df = await jsp.readObject("artifacts/DataFrame-nested", null, test_globals);
+    expect(df.columnNames()).toEqual(["X", "Y"])
     expect(df.column(0) instanceof bioc.DataFrame).toBe(true);
     expect(df.column(0).column("foo")).toEqual(new Int32Array([1,2,3,4,5,6,7,8,9,10]));
     expect(df.column(0).column("bar")).toEqual(["a","b","c","d","e","f","g","h","i","j"]);
     expect(df.column(1)).toEqual(["A","B","C","D","E","F","G","H","I","J"]);
+
+    let df2 = await jsp.readObject("artifacts/DataFrame-nested", null, test_globals, { 
+        DataFrame_readNested: function(nr, path, metadata, globals, options) {
+            return new Array(nr).fill(null);
+        }
+    });
+    expect(df2.columnNames()).toEqual(["X", "Y"])
+    expect(df2.column(0)).toEqual(new Array(10).fill(null));
+
+    let df3 = await jsp.readObject("artifacts/DataFrame-nested", null, test_globals, { DataFrame_readNested: false });
+    expect(df3.columnNames()).toEqual(["Y"])
 })
