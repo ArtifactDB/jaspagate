@@ -14,7 +14,7 @@ export class GlobalFsInterface {
      * If ``asBuffer = true`` or if no local filesystem exists, this will instead be a Uint8Array of the file contents.
      */
     get(path, options = {}) {
-        throw new Error("'get()' is not implemented in this GlobalFs subclass");
+        throw new Error("'get()' is not implemented in this GlobalFsInterface subclass");
     }
 
     /**
@@ -23,7 +23,7 @@ export class GlobalFsInterface {
      * @return {boolean} Whether the `path` exists.
      */
     exists(path) {
-        throw new Error("'exists()' is not implemented in this GlobalFs subclass");
+        throw new Error("'exists()' is not implemented in this GlobalFsInterface subclass");
     }
 
     /**
@@ -37,7 +37,7 @@ export class GlobalFsInterface {
      * No value is returned.
      */
     write(path, contents) {
-        throw new Error("'write()' is not implemented in this GlobalFs subclass");
+        throw new Error("'write()' is not implemented in this GlobalFsInterface subclass");
     }
 
     /**
@@ -46,7 +46,7 @@ export class GlobalFsInterface {
      * No value is returned.
      */ 
     clean(path) {
-        throw new Error("'clean()' is not implemented in this GlobalFs subclass");
+        throw new Error("'clean()' is not implemented in this GlobalFsInterface subclass");
     }
 
     /**
@@ -57,7 +57,7 @@ export class GlobalFsInterface {
      * No value is returned.
      */ 
     mkdir(path) {
-        throw new Error("'mkdir()' is not implemented in this GlobalFs subclass");
+        throw new Error("'mkdir()' is not implemented in this GlobalFsInterface subclass");
     }
 }
 
@@ -77,6 +77,16 @@ class GlobalH5Interface {
      * @return {H5Group} A handle to the HDF5 file.
      */
     open(x, options = {}) {
-        throw new Error("'open()' is not implemented in this GlobalH5 subclass");
+        throw new Error("'open()' is not implemented in this GlobalH5Interface subclass");
+    }
+
+    /**
+     * @param {H5Group} handle - Return value of {@linkcode GlobalH5Interface#open open}.
+     * This will already have its {@linkcode H5Group#close close} method invoked.
+     * @return This should execute clean-up operations when the file used in `open` is no longer needed.
+     * No value is returned.
+     */
+    close(handle) {
+        throw new Error("'close()' is not implemented in this GlobalH5Interface subclass");
     }
 }

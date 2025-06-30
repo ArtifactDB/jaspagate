@@ -21,6 +21,7 @@ export const test_globals = {
             await hdf5.ready;
             let handle = new hdf5.File(path, readOnly ? "r" : "w");
             return new TestH5Group(handle);
-        }
+        },
+        close: (handle) => {} // no-op.
     }
 };

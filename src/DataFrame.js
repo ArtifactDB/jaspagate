@@ -253,10 +253,13 @@ export async function readDataFrame(path, metadata, globals, options = {}) {
         return new DataFrame(collected, { columnOrder: colnames, numberOfRows: nrows, rowNames: rownames });
 
     } finally {
-        for (const handle of handle_stack.reverse()) {
+        for (const handle of handle_stack.toReversed()) {
             handle.close();
         }
-        globals.fs.clean(contents);
+        if (handle_stack.length > 0) {
+            await globals.h5.close(handle_stack[0]);
+        }
+        await globals.fs.clean(contents);
     }
 }
 
@@ -490,8 +493,11 @@ export async function saveDataFrame(x, path, globals, options = {}) {
         }
 
     } finally {
-        for (const handle of handle_stack.reverse()) {
+        for (const handle of handle_stack.toReversed()) {
             handle.close();
+        }
+        if (handle_stack.length > 0) {
+            await globals.h5.close(handle_stack[0]);
         }
     }
 
