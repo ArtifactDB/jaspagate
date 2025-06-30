@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>SingleCellExperiment.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    
+    <h2><a href="index.html">Home</a></h2><h2><a href="https://github.com/LTLA/bioconductor.js" target="_blank" class="menu-item" id="repository" >Code Repo</a></h2><h3>Classes</h3><ul><li><a href="GlobalFsInterface.html">GlobalFsInterface</a><ul class='methods'><li data-type='method' style='display: none;'><a href="GlobalFsInterface.html#clean">clean</a></li><li data-type='method' style='display: none;'><a href="GlobalFsInterface.html#exists">exists</a></li><li data-type='method' style='display: none;'><a href="GlobalFsInterface.html#get">get</a></li><li data-type='method' style='display: none;'><a href="GlobalFsInterface.html#mkdir">mkdir</a></li><li data-type='method' style='display: none;'><a href="GlobalFsInterface.html#write">write</a></li></ul></li><li><a href="GlobalH5Interface.html">GlobalH5Interface</a><ul class='methods'><li data-type='method' style='display: none;'><a href="GlobalH5Interface.html#open">open</a></li></ul></li><li><a href="H5DataSet.html">H5DataSet</a><ul class='methods'><li data-type='method' style='display: none;'><a href="H5DataSet.html#close">close</a></li><li data-type='method' style='display: none;'><a href="H5DataSet.html#readAttribute">readAttribute</a></li><li data-type='method' style='display: none;'><a href="H5DataSet.html#shape">shape</a></li><li data-type='method' style='display: none;'><a href="H5DataSet.html#type">type</a></li><li data-type='method' style='display: none;'><a href="H5DataSet.html#values">values</a></li><li data-type='method' style='display: none;'><a href="H5DataSet.html#write">write</a></li></ul></li><li><a href="H5Group.html">H5Group</a><ul class='methods'><li data-type='method' style='display: none;'><a href="H5Group.html#children">children</a></li><li data-type='method' style='display: none;'><a href="H5Group.html#close">close</a></li><li data-type='method' style='display: none;'><a href="H5Group.html#createDataSet">createDataSet</a></li><li data-type='method' style='display: none;'><a href="H5Group.html#createGroup">createGroup</a></li><li data-type='method' style='display: none;'><a href="H5Group.html#open">open</a></li><li data-type='method' style='display: none;'><a href="H5Group.html#readAttribute">readAttribute</a></li><li data-type='method' style='display: none;'><a href="H5Group.html#writeAttribute">writeAttribute</a></li></ul></li></ul><h3>Externals</h3><ul><li><a href="external-DataFrame.html">external:DataFrame</a></li><li><a href="external-SingleCellExperiment.html">external:SingleCellExperiment</a></li><li><a href="external-SummarizedExperiment.html">external:SummarizedExperiment</a></li></ul><h3>Global</h3><ul><li><a href="global.html#readDataFrame">readDataFrame</a></li><li><a href="global.html#readObject">readObject</a></li><li><a href="global.html#readObjectFile">readObjectFile</a></li><li><a href="global.html#readObjectRegistry">readObjectRegistry</a></li><li><a href="global.html#readSingleCellExperiment">readSingleCellExperiment</a></li><li><a href="global.html#readSummarizedExperiment">readSummarizedExperiment</a></li><li><a href="global.html#saveDataFrame">saveDataFrame</a></li><li><a href="global.html#saveObject">saveObject</a></li><li><a href="global.html#saveObjectRegistry">saveObjectRegistry</a></li><li><a href="global.html#saveSingleCellExperiment">saveSingleCellExperiment</a></li><li><a href="global.html#saveSummarizedExperiment">saveSummarizedExperiment</a></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">SingleCellExperiment.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { SingleCellExperiment } from "bioconductor";
+import { H5Group, H5DataSet } from "./h5.js";
+import { readObject, readObjectFile, saveObject } from "./general.js";
+import { readSummarizedExperiment, saveSummarizedExperiment } from "./SummarizedExperiment.js"; 
+
+/**
+ * A single-cell experiment.
+ * @external SingleCellExperiment 
+ * @see {@link https://ltla.github.io/bioconductor.js/SingleCellExperiment.html}
+ */
+
+/**
+ * @param {string} path - Path to the takane-formatted object directory containing the {@link external:SingleCellExperiment SingleCellExperiment}.
+ * @param {object} metadata - Takane object metadata, typically generated by calling {@linkcode readObjectFile} on `path`.
+ * @param {object} globals - Object containing `fs`, an object satisfying the {@link GlobalFsInterface}; and `h5`, an object satisfying the {@link GlobalH5Interface}.
+ * @param {object} [options={}] - Further options.
+ * @param {function|boolean} [options.SingleCellExperiment_readReducedDimension=true] - How to read each dimensionality reduction result.
+ * If `true`, {@linkcode readObject} is used, while if `false`, the reduced dimensions will be skipped.
+ * If a function is provided, it should accept `ncol` (the number of columns in the SingleCellExperiment) as well as `path`, `metadata`, `globals` and `options` (as described above);
+ * and should return an object (possibly asynchronously) for which [`NUMBER_OF_ROWS`](https://ltla.github.io/bioconductor.js/global.html#NUMBER_OF_ROWS) is equal to `ncol`. 
+ * @param {function|boolean} [options.SingleCellExperiment_readAlternativeExperiment=true] - How to read each alternative experiment.
+ * If `true`, {@linkcode readObject} is used, while if `false`, the alternative experiments will be skipped.
+ * If a function is provided, it should accept `ncol` (the number of columns in the SingleCellExperiment) as well as `path`, `metadata`, `globals` and `options` (as described above);
+ * and should return a {@link external:SummarizedExperiemnt SummarizedExperiment} (possibly asynchronously)
+ * for which [`NUMBER_OF_COLUMNS`](https://ltla.github.io/bioconductor.js/global.html#NUMBER_OF_COLUMNS) is equal to `ncol`. 
+ *
+ * @return {external:SingleCellExperiment} The single-cell experiment object.
+ * @async
+ */
+export async function readSingleCellExperiment(path, metadata, globals, options = {}) {
+    let se = await readSummarizedExperiment(path, metadata, globals, options);
+
+    let all_assays = {};
+    const assay_names = se.assayNames();
+    for (const aname of assay_names) {
+        all_assays[aname] = se.assay(aname);
+    }
+
+    let sce = new SingleCellExperiment(
+        all_assays,
+        {
+            assayOrder: se.assayNames(),
+            rowData: se.rowData(),
+            columnData: se.columnData(),
+            rowNames: se.rowNames(),
+            columnNames: se.columnNames(),
+            metadata: se.metadata(),
+        }
+    );
+
+    let read_rd = true;
+    if ("SingleCellExperiment_readReducedDimension" in options) {
+        read_rd = options.SingleCellExperiment_readReducedDimension;
+    }
+    if (read_rd !== false) {
+        const rdpath = path + "/reduced_dimensions/names.json";
+        if (await globals.fs.exists(rdpath)) {
+            let names_contents = await globals.fs.get(rdpath, { asBuffer: true });
+            const dec = new TextDecoder;
+            const reddim_names = JSON.parse(dec.decode(names_contents));
+            for (const [i, rname] of Object.entries(reddim_names)) {
+                let rdpath = path + "/reduced_dimensions/" + String(i);
+                let rdmeta = await readObjectFile(rdpath, globals);
+                let currd;
+                if (read_rd === true) {
+                    currd = await readObject(rdpath, rdmeta, globals, options);
+                } else {
+                    currd = await read_rd(sce.numberOfColumns(), rdpath, rdmeta, globals, options);
+                }
+                sce.$setReducedDimension(rname, currd);
+            }
+        }
+    }
+
+    let read_ae = true;
+    if ("SingleCellExperiment_readAlternativeExperiment" in options) {
+        read_ae = options.SingleCellExperiment_readAlternativeExperiment;
+    }
+    if (read_ae !== false) {
+        const aepath = path + "/alternative_experiments/names.json";
+        if (await globals.fs.exists(aepath)) {
+            let names_contents = await globals.fs.get(aepath, { asBuffer: true });
+            const dec = new TextDecoder;
+            const altexp_names = JSON.parse(dec.decode(names_contents));
+            for (const [i, aname] of Object.entries(altexp_names)) {
+                let aepath = path + "/alternative_experiments/" + String(i);
+                let aemeta = await readObjectFile(aepath, globals);
+                let curae;
+                if (read_ae === true) {
+                    curae = await readObject(aepath, aemeta, globals, options);
+                } else {
+                    curae = await read_ae(sce.numberOfColumns(), aepath, aemeta, globals, options);
+                }
+                sce.$setAlternativeExperiment(aname, curae);
+            }
+        }
+    }
+
+    return sce;
+}
+
+/**
+ * @param {external:SingleCellExperiment} x - The single-cell experiment.
+ * @param {string} path - Path to the directory in which to save `x`.
+ * @param {object} globals - Object containing `fs`, an object satisfying the {@link GlobalFsInterface}; and `h5`, an object satisfying the {@link GlobalH5Interface}.
+ * @param {object} [options={}] - Further options.
+ *
+ * @return `x` is stored at `path`.
+ * @async
+ */
+export async function saveSingleCellExperiment(x, path, globals, options = {}) {
+    await saveSummarizedExperiment(x, path, globals, options);
+
+    let object_contents = globals.fs.get(path + "/OBJECT", { asBuffer: true });
+    const dec = new TextDecoder;
+    const existing = JSON.parse(dec.decode(object_contents));
+    existing.type = "single_cell_experiment";
+    existing.ranged_summarized_experiment = { "version": "1.0" };
+    existing.single_cell_experiment = { "version": "1.0" };
+    await globals.fs.write(path + "/OBJECT", JSON.stringify(existing));
+
+    const reddim_names = x.reducedDimensionNames();
+    if (reddim_names.length > 0) {
+        await globals.fs.mkdir(path + "/reduced_dimensions");
+        await globals.fs.write(path + "/reduced_dimensions/names.json", JSON.stringify(reddim_names));
+        for (const [i, rname] of Object.entries(reddim_names)) {
+            await saveObject(x.reducedDimension(rname), path + "/reduced_dimensions/" + String(i), globals, options);
+        }
+    }
+
+    const altexp_names = x.alternativeExperimentNames();
+    if (altexp_names.length > 0) {
+        await globals.fs.mkdir(path + "/alternative_experiments");
+        await globals.fs.write(path + "/alternative_experiments/names.json", JSON.stringify(altexp_names));
+        for (const [i, aname] of Object.entries(altexp_names)) {
+            await saveObject(x.alternativeExperiment(aname), path + "/alternative_experiments/" + String(i), globals, options);
+        }
+    }
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.4</a> on Mon Jun 30 2025 20:17:16 GMT+0000 (Coordinated Universal Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
+</body>
+</html>

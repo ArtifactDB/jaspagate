@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>h5.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    
+    <h2><a href="index.html">Home</a></h2><h2><a href="https://github.com/LTLA/bioconductor.js" target="_blank" class="menu-item" id="repository" >Code Repo</a></h2><h3>Classes</h3><ul><li><a href="GlobalFsInterface.html">GlobalFsInterface</a><ul class='methods'><li data-type='method' style='display: none;'><a href="GlobalFsInterface.html#clean">clean</a></li><li data-type='method' style='display: none;'><a href="GlobalFsInterface.html#exists">exists</a></li><li data-type='method' style='display: none;'><a href="GlobalFsInterface.html#get">get</a></li><li data-type='method' style='display: none;'><a href="GlobalFsInterface.html#mkdir">mkdir</a></li><li data-type='method' style='display: none;'><a href="GlobalFsInterface.html#write">write</a></li></ul></li><li><a href="GlobalH5Interface.html">GlobalH5Interface</a><ul class='methods'><li data-type='method' style='display: none;'><a href="GlobalH5Interface.html#open">open</a></li></ul></li><li><a href="H5DataSet.html">H5DataSet</a><ul class='methods'><li data-type='method' style='display: none;'><a href="H5DataSet.html#close">close</a></li><li data-type='method' style='display: none;'><a href="H5DataSet.html#readAttribute">readAttribute</a></li><li data-type='method' style='display: none;'><a href="H5DataSet.html#shape">shape</a></li><li data-type='method' style='display: none;'><a href="H5DataSet.html#type">type</a></li><li data-type='method' style='display: none;'><a href="H5DataSet.html#values">values</a></li><li data-type='method' style='display: none;'><a href="H5DataSet.html#write">write</a></li></ul></li><li><a href="H5Group.html">H5Group</a><ul class='methods'><li data-type='method' style='display: none;'><a href="H5Group.html#children">children</a></li><li data-type='method' style='display: none;'><a href="H5Group.html#close">close</a></li><li data-type='method' style='display: none;'><a href="H5Group.html#createDataSet">createDataSet</a></li><li data-type='method' style='display: none;'><a href="H5Group.html#createGroup">createGroup</a></li><li data-type='method' style='display: none;'><a href="H5Group.html#open">open</a></li><li data-type='method' style='display: none;'><a href="H5Group.html#readAttribute">readAttribute</a></li><li data-type='method' style='display: none;'><a href="H5Group.html#writeAttribute">writeAttribute</a></li></ul></li></ul><h3>Externals</h3><ul><li><a href="external-DataFrame.html">external:DataFrame</a></li><li><a href="external-SingleCellExperiment.html">external:SingleCellExperiment</a></li><li><a href="external-SummarizedExperiment.html">external:SummarizedExperiment</a></li></ul><h3>Global</h3><ul><li><a href="global.html#readDataFrame">readDataFrame</a></li><li><a href="global.html#readObject">readObject</a></li><li><a href="global.html#readObjectFile">readObjectFile</a></li><li><a href="global.html#readObjectRegistry">readObjectRegistry</a></li><li><a href="global.html#readSingleCellExperiment">readSingleCellExperiment</a></li><li><a href="global.html#readSummarizedExperiment">readSummarizedExperiment</a></li><li><a href="global.html#saveDataFrame">saveDataFrame</a></li><li><a href="global.html#saveObject">saveObject</a></li><li><a href="global.html#saveObjectRegistry">saveObjectRegistry</a></li><li><a href="global.html#saveSingleCellExperiment">saveSingleCellExperiment</a></li><li><a href="global.html#saveSummarizedExperiment">saveSummarizedExperiment</a></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">h5.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Representation of a group inside a HDF5 file.
+ * This is an abstract interface that should not be created directly.
+ * @hideconstructor
+ */
+export class H5Group {
+    /**
+     * @member {Array}
+     * @desc Array containing the names of all attributes of this object.
+     */
+    attributes() {
+        throw new Error("'attributes()' is not implemented in this H5Group subclass");
+    }
+
+    /**
+     * @param {string} attr - Name of the attribute.
+     * @return {object} Object containing:
+     * - `values`, an Array or TypedArray containing the attribute data.
+     *   This should have length equal to the product of `shape` for non-scalar attributes.
+     * - `shape`, an Array containing the dimensions of the attribute.
+     *   This is empty for scalar attributes, in which case `values` will have length 1.
+     */
+    readAttribute(attr) {
+        throw new Error("'readAttribute()' is not implemented in this H5Group subclass");
+    }
+
+    /**
+     * @param {string} attr - Name of the attribute.
+     * @param {string} type - Type of attribute to create.
+     * This can be `"IntX"` or `"UintX"` for `X` of 8, 16, 32, or 64; or `"FloatX"` for `X` of 32 or 64; or `"String"`.
+     * @param {?Array} shape - Array containing the dimensions of the attribute to create.
+     * If set to an empty array, this will create a scalar dataset.
+     * @param {TypedArray|Array} x - Values to be written to the new attribute.
+     * This should be of length equal to the product of `shape` - unless `shape` is empty, in which case it should be of length 1.
+     * @param {object} [options={}] - Optional parameters.
+     * @param {?number} [options.maxStringLength=null] - Maximum length of the strings to be saved.
+     * Only used when `type = "String"`.
+     * If `null`, this is inferred from the maximum length of strings in `data`.
+     */
+    writeAttribute(attr, type, shape, data, options = { maxStringLength: null }) {
+        throw new Error("'writeAttribute()' is not implemented in this H5Group subclass");
+    }
+
+    /**
+     * @return {Array} Names of the children of this group.
+     */
+    children() {
+        throw new Error("'children()' is not implemented in this H5Group subclass");
+    }
+
+    /**
+     * @param {string} name - Name of the child element to open.
+     * @return {H5Group|H5DataSet} Object representing the child element.
+     */
+    open(name) {
+        throw new Error("'open()' is not implemented in this H5Group subclass");
+    }
+
+    /**
+     * @param {string} name - Name of the group to create.
+     *
+     * @return {@H5Group} A group is created as an immediate child of the current group.
+     * A {@linkplain H5Group} object is returned representing this new group.
+     * If a group already exists at `name`, it is returned directly.
+     */
+    createGroup(name) {
+        throw new Error("'createGroup()' is not implemented in this H5Group subclass");
+    }
+
+    /**
+     * @param {string} name - Name of the dataset to create.
+     * @param {string|object} type - Type of dataset to create.
+     * This can be `"IntX"` or `"UintX"` for `X` of 8, 16, 32, or 64; or `"FloatX"` for `X` of 32 or 64; or `"String"`.
+     * @param {Array} shape - Array containing the dimensions of the dataset to create.
+     * This can be set to an empty array to create a scalar dataset.
+     * @param {object} [options={}] - Optional parameters.
+     * @param {number} [options.maxStringLength=null] - Maximum length of the strings to be saved.
+     * Only used when `type = "String"`.
+     * If `null`, this should be inferred from the maximum length of strings in `options.data`.
+     * If `options.data` is `null`, this must be provided for `type = "String"`.
+     * @param {?(Array|TypedArray)} [options.data=null] - Array to be written to the dataset.
+     * This is equivalent to calling {@linkcode H5DataSet#write H5DataSet.write} immediately after the dataset is created.
+     *
+     * @return {H5DataSet} A dataset of the specified type and shape is created as an immediate child of the current group.
+     * A {@linkplain H5DataSet} object is returned representing this new dataset.
+     */
+    createDataSet(name, type, shape, options = { maxStringLength: null, data: null }) {
+        throw new Error("'createDataSet()' is not implemented in this H5Group subclass");
+    }
+
+    /**
+     * @return Closes the group handle.
+     * Any subsequent method invocations on this group or its children are considered invalid.
+     */
+    close() {
+        throw new Error("'close()' is not implemented in this H5Group subclass");
+    }
+}
+
+/**
+ * Representation of a dataset inside a HDF5 file.
+ * This is an abstract interface that should not be created directly.
+ * @hideconstructor
+ */
+export class H5DataSet {
+    /**
+     * @member {Array}
+     * @desc Array containing the names of all attributes of this object.
+     */
+    attributes() {
+        throw new Error("'attributes()' is not implemented in this H5Group subclass");
+    }
+
+    /**
+     * @param {string} attr - Name of the attribute.
+     * @return {object} Object containing:
+     * - `values`, an Array or TypedArray containing the attribute data.
+     *   This should have length equal to the product of `shape` for non-scalar attributes.
+     * - `shape`, an Array containing the dimensions of the attribute.
+     *   This is empty for scalar attributes, in which case `values` will have length 1.
+     */
+    readAttribute(attr) {
+        throw new Error("'readAttribute()' is not implemented in this H5Group subclass");
+    }
+
+    /**
+     * @return {string|object} String containing the type of the dataset.
+     * This may be `"IntX"` or `"UintX"` for `X` of 8, 16, 32, or 64; or `"FloatX"` for `X` of 32 or 64; or `"String"`.
+     * Alternatively, this may be an object representing a compound dataype, where keys and values are the names and types of each component.
+     */
+    type() {
+        throw new Error("'type()' is not implemented in this H5DataSet subclass");
+    }
+
+    /**
+     * @return {Array} Array of integers containing the dimensions of the dataset.
+     * If this is an empty array, the dataset is a scalar.
+     */
+    shape() {
+        throw new Error("'shape()' is not implemented in this H5DataSet subclass");
+    }
+
+    /**
+     * @return {Array|TypedArray} The contents of this dataset.
+     * This has length equal to the product of {@linkcode H5DataSet#shape shape} - unless this dataset is scalar, in which case it has length 1.
+     * For compound datatypes, each element of the output array is an object.
+     */
+    values() {
+        throw new Error("'values()' is not implemented in this H5DataSet subclass");
+    }
+
+    /**
+     * @param {Array|TypedArray} x - Values to write to the dataset.
+     * This should be of length equal to the product of {@linkcode H5DataSet#shape shape} -  unless `shape` is empty, in which case it should be of length 1.
+     *
+     * @return `x` is written to the dataset on file.
+     * No return value is provided.
+     */
+    write(x, options = {}) {
+        throw new Error("'write()' is not implemented in this H5DataSet subclass");
+    }
+
+    /**
+     * @return Closes the dataset handle.
+     * Any subsequent method invocations on this dataset need not be valid.
+     */
+    close() {
+        throw new Error("'close()' is not implemented in this H5DataSet subclass");
+    }
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.4</a> on Mon Jun 30 2025 20:17:16 GMT+0000 (Coordinated Universal Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
+</body>
+</html>

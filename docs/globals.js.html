@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>globals.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    
+    <h2><a href="index.html">Home</a></h2><h2><a href="https://github.com/LTLA/bioconductor.js" target="_blank" class="menu-item" id="repository" >Code Repo</a></h2><h3>Classes</h3><ul><li><a href="GlobalFsInterface.html">GlobalFsInterface</a><ul class='methods'><li data-type='method' style='display: none;'><a href="GlobalFsInterface.html#clean">clean</a></li><li data-type='method' style='display: none;'><a href="GlobalFsInterface.html#exists">exists</a></li><li data-type='method' style='display: none;'><a href="GlobalFsInterface.html#get">get</a></li><li data-type='method' style='display: none;'><a href="GlobalFsInterface.html#mkdir">mkdir</a></li><li data-type='method' style='display: none;'><a href="GlobalFsInterface.html#write">write</a></li></ul></li><li><a href="GlobalH5Interface.html">GlobalH5Interface</a><ul class='methods'><li data-type='method' style='display: none;'><a href="GlobalH5Interface.html#open">open</a></li></ul></li><li><a href="H5DataSet.html">H5DataSet</a><ul class='methods'><li data-type='method' style='display: none;'><a href="H5DataSet.html#close">close</a></li><li data-type='method' style='display: none;'><a href="H5DataSet.html#readAttribute">readAttribute</a></li><li data-type='method' style='display: none;'><a href="H5DataSet.html#shape">shape</a></li><li data-type='method' style='display: none;'><a href="H5DataSet.html#type">type</a></li><li data-type='method' style='display: none;'><a href="H5DataSet.html#values">values</a></li><li data-type='method' style='display: none;'><a href="H5DataSet.html#write">write</a></li></ul></li><li><a href="H5Group.html">H5Group</a><ul class='methods'><li data-type='method' style='display: none;'><a href="H5Group.html#children">children</a></li><li data-type='method' style='display: none;'><a href="H5Group.html#close">close</a></li><li data-type='method' style='display: none;'><a href="H5Group.html#createDataSet">createDataSet</a></li><li data-type='method' style='display: none;'><a href="H5Group.html#createGroup">createGroup</a></li><li data-type='method' style='display: none;'><a href="H5Group.html#open">open</a></li><li data-type='method' style='display: none;'><a href="H5Group.html#readAttribute">readAttribute</a></li><li data-type='method' style='display: none;'><a href="H5Group.html#writeAttribute">writeAttribute</a></li></ul></li></ul><h3>Externals</h3><ul><li><a href="external-DataFrame.html">external:DataFrame</a></li><li><a href="external-SingleCellExperiment.html">external:SingleCellExperiment</a></li><li><a href="external-SummarizedExperiment.html">external:SummarizedExperiment</a></li></ul><h3>Global</h3><ul><li><a href="global.html#readDataFrame">readDataFrame</a></li><li><a href="global.html#readObject">readObject</a></li><li><a href="global.html#readObjectFile">readObjectFile</a></li><li><a href="global.html#readObjectRegistry">readObjectRegistry</a></li><li><a href="global.html#readSingleCellExperiment">readSingleCellExperiment</a></li><li><a href="global.html#readSummarizedExperiment">readSummarizedExperiment</a></li><li><a href="global.html#saveDataFrame">saveDataFrame</a></li><li><a href="global.html#saveObject">saveObject</a></li><li><a href="global.html#saveObjectRegistry">saveObjectRegistry</a></li><li><a href="global.html#saveSingleCellExperiment">saveSingleCellExperiment</a></li><li><a href="global.html#saveSummarizedExperiment">saveSummarizedExperiment</a></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">globals.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Interface for `globals.fs`.
+ * Applications are expected to implement each of the documented methods.
+ * @hideconstructor
+ */
+export class GlobalFsInterface {
+    /**
+     * @param {string} path - Path to the file.
+     * This may be relative or absolute, depending on the application.
+     * @param {object} [options={}] - Further options.
+     * @param {boolean} [options.asBuffer=false] - Whether to return the file contents as a Uint8Array.
+     *
+     * @return {Uint8Array|string} Path to the file on the local filesystem.
+     * If ``asBuffer = true`` or if no local filesystem exists, this will instead be a Uint8Array of the file contents.
+     */
+    get(path, options = {}) {
+        throw new Error("'get()' is not implemented in this GlobalFs subclass");
+    }
+
+    /**
+     * @param {string} path - Path to the file.
+     * This may be relative or absolute, depending on the application.
+     * @return {boolean} Whether the `path` exists.
+     */
+    exists(path) {
+        throw new Error("'exists()' is not implemented in this GlobalFs subclass");
+    }
+
+    /**
+     * @param {string} path - Path to the file.
+     * This may be relative or absolute, depending on the application.
+     * @param {Uint8Array} contents - Contents of the file.
+     *
+     * @return `contents` should be stored at `path`.
+     * The exact nature of this storage depends on the application.
+     * If `path` already exists, it should be overwritten with `contents`.
+     * No value is returned.
+     */
+    write(path, contents) {
+        throw new Error("'write()' is not implemented in this GlobalFs subclass");
+    }
+
+    /**
+     * @param {string} path - Path to the file, as used in {@linkcode GlobalFsInterface#get get}.
+     * @return Any temporary file created by {@linkcode get} for `path` is removed.
+     * No value is returned.
+     */ 
+    clean(path) {
+        throw new Error("'clean()' is not implemented in this GlobalFs subclass");
+    }
+
+    /**
+     * @param {string} path - Path to a directory.
+     * It is assumed that all parent directories have already been created.
+     * @return A new directory is created at `path`.
+     * (This may be a no-op if the application does not support creation of directories.)
+     * No value is returned.
+     */ 
+    mkdir(path) {
+        throw new Error("'mkdir()' is not implemented in this GlobalFs subclass");
+    }
+}
+
+/**
+ * Interface for `globals.h5`.
+ * Applications are expected to implement each of the documented methods.
+ * @hideconstructor
+ */
+class GlobalH5Interface {
+    /**
+     * @param {string|Uint8Array} contents - Path to a HDF5 file, or a Uint8Array containing the contents of such a file.
+     * The latter may be provided if no filesystem is available.
+     * @param {object} [options={}] - Further options.
+     * @param {boolean} [options.readOnly=true] - Whether to open the file in read-only mode.
+     * If `false` and the file does not already exist, a new file will be created. 
+     *
+     * @return {H5Group} A handle to the HDF5 file.
+     */
+    open(x, options = {}) {
+        throw new Error("'open()' is not implemented in this GlobalH5 subclass");
+    }
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.4</a> on Mon Jun 30 2025 20:17:16 GMT+0000 (Coordinated Universal Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>general.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    
+    <h2><a href="index.html">Home</a></h2><h2><a href="https://github.com/LTLA/bioconductor.js" target="_blank" class="menu-item" id="repository" >Code Repo</a></h2><h3>Classes</h3><ul><li><a href="GlobalFsInterface.html">GlobalFsInterface</a><ul class='methods'><li data-type='method' style='display: none;'><a href="GlobalFsInterface.html#clean">clean</a></li><li data-type='method' style='display: none;'><a href="GlobalFsInterface.html#exists">exists</a></li><li data-type='method' style='display: none;'><a href="GlobalFsInterface.html#get">get</a></li><li data-type='method' style='display: none;'><a href="GlobalFsInterface.html#mkdir">mkdir</a></li><li data-type='method' style='display: none;'><a href="GlobalFsInterface.html#write">write</a></li></ul></li><li><a href="GlobalH5Interface.html">GlobalH5Interface</a><ul class='methods'><li data-type='method' style='display: none;'><a href="GlobalH5Interface.html#open">open</a></li></ul></li><li><a href="H5DataSet.html">H5DataSet</a><ul class='methods'><li data-type='method' style='display: none;'><a href="H5DataSet.html#close">close</a></li><li data-type='method' style='display: none;'><a href="H5DataSet.html#readAttribute">readAttribute</a></li><li data-type='method' style='display: none;'><a href="H5DataSet.html#shape">shape</a></li><li data-type='method' style='display: none;'><a href="H5DataSet.html#type">type</a></li><li data-type='method' style='display: none;'><a href="H5DataSet.html#values">values</a></li><li data-type='method' style='display: none;'><a href="H5DataSet.html#write">write</a></li></ul></li><li><a href="H5Group.html">H5Group</a><ul class='methods'><li data-type='method' style='display: none;'><a href="H5Group.html#children">children</a></li><li data-type='method' style='display: none;'><a href="H5Group.html#close">close</a></li><li data-type='method' style='display: none;'><a href="H5Group.html#createDataSet">createDataSet</a></li><li data-type='method' style='display: none;'><a href="H5Group.html#createGroup">createGroup</a></li><li data-type='method' style='display: none;'><a href="H5Group.html#open">open</a></li><li data-type='method' style='display: none;'><a href="H5Group.html#readAttribute">readAttribute</a></li><li data-type='method' style='display: none;'><a href="H5Group.html#writeAttribute">writeAttribute</a></li></ul></li></ul><h3>Externals</h3><ul><li><a href="external-DataFrame.html">external:DataFrame</a></li><li><a href="external-SingleCellExperiment.html">external:SingleCellExperiment</a></li><li><a href="external-SummarizedExperiment.html">external:SummarizedExperiment</a></li></ul><h3>Global</h3><ul><li><a href="global.html#readDataFrame">readDataFrame</a></li><li><a href="global.html#readObject">readObject</a></li><li><a href="global.html#readObjectFile">readObjectFile</a></li><li><a href="global.html#readObjectRegistry">readObjectRegistry</a></li><li><a href="global.html#readSingleCellExperiment">readSingleCellExperiment</a></li><li><a href="global.html#readSummarizedExperiment">readSummarizedExperiment</a></li><li><a href="global.html#saveDataFrame">saveDataFrame</a></li><li><a href="global.html#saveObject">saveObject</a></li><li><a href="global.html#saveObjectRegistry">saveObjectRegistry</a></li><li><a href="global.html#saveSingleCellExperiment">saveSingleCellExperiment</a></li><li><a href="global.html#saveSummarizedExperiment">saveSummarizedExperiment</a></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">general.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import * as bioc from "bioconductor";
+import * as df from "./DataFrame.js";
+import * as se from "./SummarizedExperiment.js";
+import * as sce from "./SingleCellExperiment.js";
+
+/**
+ * @param {string} path - Path to the takane-formatted object directory containing the {@link DataFrame}.
+ * @param {object} globals - Object containing `fs`, an object satisfying the {@link GlobalFsInterface}. 
+ * @return {object} Object metadata.
+ * @async
+ */
+export async function readObjectFile(path, globals) {
+    let payload = await globals.fs.get(path + "/OBJECT", { asBuffer: true });
+    let dec = new TextDecoder;
+    return JSON.parse(dec.decode(payload));
+}
+
+/**
+ * @type {object}
+ * @desc Registry of reader functions.
+ * Each key is a takane object type, and each value is a function that accepts the same arguments as {@linkcode readObject}.
+ */
+export const readObjectRegistry = {};
+
+/**
+ * This function will inspect {@linkcode readObjectRegistry} to check if any reader function is supplied for the takane object type at `path`.
+ * If found, it will use that function, otherwise it will fall back to the default functions.
+ *
+ * @param {string} path - Path to a takane-formatted object directory. 
+ * @param {?object} metadata - Object metadata.
+ * If `null`, this is automatically loaded by calling {@linkcode readObjectFile} on `path`.
+ * @param {object} globals - Object containing `fs`, an object satisfying the {@link GlobalFsInterface}; and `h5`, an object satisfying the {@link GlobalH5Interface}.
+ * @param {object} [options={}] - Further options, to be passed to the reader functions for individual takane object types.
+ *
+ * @return Some in-memory representation of the takane object at `path`.
+ * @async
+ */
+export async function readObject(path, metadata, globals, options = {}) {
+    if (metadata == null) {
+        metadata = await readObjectFile(path, globals);
+    }
+
+    let objtype = metadata["type"];
+    if (objtype in readObjectRegistry) {
+        return readObjectRegistry[objtype](path, metadata, globals, options);
+
+    } else {
+        const defaults = {
+            "data_frame": df.readDataFrame,
+            "summarized_experiment": se.readSummarizedExperiment,
+            "single_cell_experiment": sce.readSingleCellExperiment
+        };
+
+        if (objtype in defaults) {
+            return defaults[objtype](path, metadata, globals, options);
+        }
+
+        throw new Error("type '" + objtype + "' is not supported");
+    }
+}
+
+/**
+ * @type {Array}
+ * @desc Registry of saving functions.
+ * Each entry should be an array of length 2, containing a Javascript class and its saving function.
+ * Each saving function should accept the same arguments as {@linkcode saveObject}.
+ * Subclasses should be placed after their parents in this array.
+ */
+export const saveObjectRegistry = [];
+
+/**
+ * @param {Any} x - The takane-compatible object to be saved.
+ * @param {string} path - Path to the directory in which to save `x`.
+ * @param {object} globals - Object containing `fs`, an object satisfying the {@link GlobalFsInterface}; and `h5`, an object satisfying the {@link GlobalH5Interface}.
+ * @param {object} [options={}] - Further options.
+ *
+ * @return `x` is stored at `path`.
+ * @async
+ */
+export async function saveObject(x, path, globals, options = {}) {
+    for (var i = saveObjectRegistry.length; i > 0; i--) {
+        const [cls, meth] = saveObjectRegistry[i - 1];
+        if (x instanceof cls) {
+            meth(x, path, globals, options);
+            return;
+        }
+    }
+
+    const defaults = [
+        [bioc.SingleCellExperiment, sce.saveSingleCellExperiment],
+        [bioc.SummarizedExperiment, se.saveSummarizedExperiment],
+        [bioc.DataFrame, df.saveDataFrame]
+    ];
+
+    for (const [cls, fun] of defaults) {
+        if (x instanceof cls) {
+            fun(x, path, globals, options);
+            return;
+        }
+    }
+
+    throw new Error("object of type '" + x.constructor.name + "' is not supported");
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.4</a> on Mon Jun 30 2025 20:17:16 GMT+0000 (Coordinated Universal Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
+</body>
+</html>
