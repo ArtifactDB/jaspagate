@@ -503,9 +503,9 @@ export async function saveDataFrame(x, path, globals, options = {}) {
 
     let external_array = Object.entries(externals);
     if (external_array.length > 0) {
-        globals.fs.mkdir(path + "/other_columns");
+        await globals.fs.mkdir(path + "/other_columns");
         for (const [iname, col] of external_array) {
-            saveObject(col, path + "/other_columns/" + iname, globals, options);
+            await saveObject(col, path + "/other_columns/" + iname, globals, options);
         }
     }
 }
