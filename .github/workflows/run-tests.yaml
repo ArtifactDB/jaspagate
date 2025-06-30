@@ -1,0 +1,158 @@
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+name: Test JS bindings
+
+env:
+  IMAGE_VERSION: master
+
+jobs:
+  # Building the artifacts in R to be read by Javascript.
+  artifacts-from-r:
+    runs-on: ubuntu-latest
+    container: bioconductor/bioconductor_docker:devel
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Set directories
+      run: |
+        echo "R_PKG_DIR=${R_HOME}/site-library" >> $GITHUB_ENV
+
+    - name: Restore the package directory
+      uses: actions/cache@v4
+      with:
+        path: ${{ env.R_PKG_DIR }}
+        key: r-deps-${{ hashFiles('tests/r-dependencies.txt') }}
+
+    - name: Install packages
+      shell: Rscript {0}
+      run: |
+        deps <- readLines("tests/r-dependencies.txt")
+        BiocManager::install(deps)
+
+    - name: Cache artifacts from R
+      id: cache-artifacts-from-r
+      uses: actions/cache@v4
+      with:
+        path: artifacts
+        key: r-${{ hashFiles('tests/*-generate.R') }}
+
+    - name: Build artifacts from R
+      if: steps.cache-artifacts-from-r.outputs.cache-hit != 'true'
+      shell: Rscript {0}
+      run: |
+        for (fname in list.files("tests", pattern="-generate.R$")) {
+          cat("Currently running", fname, "\n")
+          source(file.path("tests", fname))
+        }
+
+  test-read-in-js:
+    runs-on: ubuntu-latest
+    needs: [ artifacts-from-r ]
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Set up Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+
+    - name: Cache modules
+      uses: actions/cache@v4
+      with:
+        path: '**/node_modules'
+        key: npm-${{ hashFiles('**/package.json') }}
+
+    - name: Update NPM packages
+      run: npm i --include=dev
+
+    - name: Cache artifacts from R
+      uses: actions/cache@v4
+      with:
+        path: artifacts
+        key: r-${{ hashFiles('tests/*-generate.R') }}
+
+    - name: Run tests
+      run: npm run test
+
+  artifacts-from-js:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Set up Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+
+    - name: Cache modules
+      uses: actions/cache@v4
+      with:
+        path: '**/node_modules'
+        key: npm-${{ hashFiles('**/package.json') }}
+
+    - name: Update NPM packages
+      run: npm i --include=dev
+
+    - name: Cache artifacts from Javascript
+      id: cache-artifacts-from-js
+      uses: actions/cache@v4
+      with:
+        path: artifacts2
+        key: js-${{ hashFiles('tests/*-generate.js') }}
+
+    - name: Build artifacts from Javascript
+      if: steps.cache-artifacts-from-js.outputs.cache-hit != 'true'
+      run: |
+        for fname in $(ls tests/*-generate.js); do
+          node $fname
+        done
+
+  test-read-in-r:
+    runs-on: ubuntu-latest
+    needs: [ artifacts-from-js ]
+    container: bioconductor/bioconductor_docker:devel
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Set directories
+      run: |
+        echo "R_PKG_DIR=${R_HOME}/site-library" >> $GITHUB_ENV
+
+    - name: Restore the package directory
+      uses: actions/cache@v4
+      with:
+        path: ${{ env.R_PKG_DIR }}
+        key: r-deps-${{ hashFiles('tests/r-dependencies.txt') }}
+
+    - name: Install packages
+      shell: Rscript {0}
+      run: |
+        deps <- readLines("tests/r-dependencies.txt")
+        BiocManager::install(deps)
+
+    - name: Cache artifacts from Javascript
+      uses: actions/cache@v4
+      with:
+        path: artifacts2
+        key: js-${{ hashFiles('tests/*-generate.js') }}
+
+    - name: Build artifacts from R
+      shell: Rscript {0}
+      run: |
+        library(testthat)
+        for (fname in list.files("tests", pattern="-read.R$")) {
+          cat("Currently testing", fname, "\n")
+          source(file.path("tests", fname))
+        }
