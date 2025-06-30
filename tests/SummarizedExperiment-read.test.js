@@ -42,3 +42,18 @@ test("readSummarizedExperiment with an unnamed object", async () => {
     expect(se.rowData().columnNames()).toEqual(["symbol"]);
     expect(se.columnData().columnNames()).toEqual(["label"]);
 })
+
+test("readSummarizedExperiment with assay overrides", async () => {
+    let se = await jsp.readObject("artifacts/SummarizedExperiment-full", null, test_globals, { 
+        SummarizedExperiment_readAssay: function(nr, nc, path, meta, globals, options) {
+            let mat = new misc.TestDenseMatrix(nr, nc);
+            mat.path = path;
+            return mat;
+        }
+    });
+
+    expect(se.numberOfRows()).toBe(100);
+    expect(se.numberOfColumns()).toBe(10);
+    expect(se.assay("counts").path).toEqual("artifacts/SummarizedExperiment-full/assays/0");
+    expect(se.assay("logcounts").path).toEqual("artifacts/SummarizedExperiment-full/assays/1");
+})
