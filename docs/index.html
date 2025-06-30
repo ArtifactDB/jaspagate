@@ -63,7 +63,59 @@
 
     <section class="readme usertext">
         <article><h1>Read and save takane objects in Javascript</h1>
-<p>This package provides methods for reading and saving <a href="https://github.com/ArtifactDB/takane"><strong>takane</strong></a>-formatted objects in Javascript.</p></article>
+<p><a href="https://github.com/ArtifactDB/jaspilite/actions/workflows/run-tests.yaml"><img src="https://github.com/ArtifactDB/jaspilite/actions/workflows/run-tests.yaml/badge.svg" alt="Unit tests"></a>
+<a href="https://github.com/ArtifactDB/jaspilite/actions/workflows/build-docs.yaml"><img src="https://github.com/ArtifactDB/jaspilite/actions/workflows/build-docs.yaml/badge.svg" alt="Build docs"></a></p>
+<h2>Overview</h2>
+<p>The <strong>jaspilite</strong> package provides methods for reading and saving <a href="https://github.com/ArtifactDB/takane"><strong>takane</strong></a>-formatted objects in Javascript.
+This enables web applications to interoperate with R and Python workflows involving complex data structures like the <a href="https://bioconductor.org/packages/SummarizedExperiment"><code>SummarizedExperiment</code></a>.
+For example, <a href="https://github.com/kanaverse/kana"><strong>kana</strong></a> can use <strong>jaspilite</strong> to pull datasets managed by the <a href="https://github.com/LTLA/scRNAseq"><strong>scRNAseq</strong> R package</a>;
+conversely, analysis results can be downloaded for further inspection in Python via the <a href="https://github.com/ArtifactDB/dolomite-base"><strong>dolomite</strong></a> framework.</p>
+<h2>Getting started</h2>
+<p>First, we have to tell <strong>jaspilite</strong> how to read and write a HDF5 file.
+This requires implementations of the <a href="https://artifactdb.github.io/H5Group"><code>H5Group</code></a> and <a href="https://artifactdb.github.io/H5DataSet"><code>H5DataSet</code></a> interfaces.
+For example, we could use the <a href="https://github.com/usnistgov/h5wasm"><strong>h5wasm</strong></a> package as shown in <a href="tests/h5.js"><code>tests/h5.js</code></a>.
+Another option might be to use the HDF5-reading utilities in <a href="https://github.com/kana/scran.js"><strong>scran.js</strong></a>.
+This choice is left to the application developer to ensure that we only bundle one copy of the HDF5-parsing library (typically a WebAssembly binary) into the application.</p>
+<p>We then define a <code>globals</code> object that specifies how to open a &quot;file&quot; in our Javascript-based application.
+This should implement the <a href="https://artifactdb.github.io/jaspilite/GlobalFsInterface.html"><code>GlobalFsInterface</code></a> and <a href="https://artifactdb.github.io/jaspilite/GlobalH5Interface.html"><code>GlobalH5Interface</code></a> interfaces.
+In a backend environment like Node.js, setting up this object is pretty easy as described in <a href="tests/globals.js"><code>tests/globals.js</code></a>.
+For the browser, the process of acquiring a file path is more involved as direct access to the filesystem is not typically allowed;
+instead, we need to either return the contents of the file as a <code>Uint8Array</code> or write to a virtual filesystem.</p>
+<p>Once we've done all that, we can finally read our objects.</p>
+<pre class="prettyprint source lang-js"><code>import * as jsp from &quot;jaspilite&quot;;
+let obj = await jsp.readObject(path, /* metadata = */ null, globals);
+await jsp.saveObject(obj, &quot;new/copy/of/object&quot;, globals);
+</code></pre>
+<p>Check out the <a href="https://artifactdb.github.io/jaspilite">reference documentation</a> for more details.</p>
+<h2>Supported objects</h2>
+<p>Currently, we only support a small number of <strong>takane</strong> formats.</p>
+<ul>
+<li><code>data_frame</code> objects are loaded as <a href="https://ltla.github.io/bioconductor.js/DataFrame.html"><code>DataFrame</code></a> instances, with the following caveats:
+<ul>
+<li>Annotations on the columns are not loaded.</li>
+<li>Metadata is not loaded or saved.</li>
+</ul>
+</li>
+<li><code>summarized_experiment</code> objects are loaded as <a href="https://ltla.github.io/bioconductor.js/SummarizedExperiment.html"><code>SummarizedExperiment</code></a> instances, with the following caveats:
+<ul>
+<li>To read or save assays, each application should define and register their own functions
+in <a href="https://artifactdb.github.io/jaspilite/readObjectRegistry"><code>readObjectRegistry</code></a> and <a href="https://artifactdb.github.io/jaspilite/saveObjectRegistry"><code>saveObjectRegistry</code></a>.
+This ensures that large datasets are directly converted to application-specific representations for optimal efficiency.</li>
+<li>Metadata is not loaded or saved.</li>
+</ul>
+</li>
+<li><code>single_cell_experiment</code> objects are loaded as <a href="https://ltla.github.io/bioconductor.js/SingleCellExperiment.html"><code>SingleCellExperiment</code></a> instances, with the following caveats:
+<ul>
+<li>Non-empty row ranges are not loaded or saved.</li>
+<li>The main experiment name is not loaded or saved.</li>
+</ul>
+</li>
+</ul>
+<p>If you need something for your application, make an <a href="https://github.com/jaspilite/issues">issue</a> and we'll see what we can do.</p>
+<h2>Links</h2>
+<p>The <a href="https://github.com/ArtifactDB/takane"><strong>takane</strong></a> specifications, which describe the file representation of each object.</p>
+<p>The <a href="https://github.com/ArtifactDB/alabaster.base"><strong>alabaster.base</strong></a> R package, to read and write <strong>takane</strong>-formatted objects in R.</p>
+<p>The <a href="https://github.com/ArtifactDB/dolomite-base"><strong>dolomite-base</strong></a> Python package, to read and write <strong>takane</strong>-formatted objects in Python.</p></article>
     </section>
 
 
@@ -78,7 +130,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.4</a> on Mon Jun 30 2025 20:28:06 GMT+0000 (Coordinated Universal Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.4</a> on Mon Jun 30 2025 21:41:57 GMT+0000 (Coordinated Universal Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>
