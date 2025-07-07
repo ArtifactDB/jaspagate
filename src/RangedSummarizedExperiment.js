@@ -21,14 +21,8 @@ import { readSummarizedExperiment, saveSummarizedExperiment } from "./Summarized
 export async function readRangedSummarizedExperiment(path, metadata, globals, options = {}) {
     let se = await readSummarizedExperiment(path, metadata, globals, options);
 
-    let all_assays = {};
-    const assay_names = se.assayNames();
-    for (const aname of assay_names) {
-        all_assays[aname] = se.assay(aname);
-    }
-
     let rse = new RangedSummarizedExperiment(
-        all_assays,
+        se.assays(),
         null,
         {
             assayOrder: se.assayNames(),

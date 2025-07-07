@@ -30,14 +30,8 @@ import { readRangedSummarizedExperiment, saveRangedSummarizedExperiment } from "
 export async function readSingleCellExperiment(path, metadata, globals, options = {}) {
     let rse = await readRangedSummarizedExperiment(path, metadata, globals, options);
 
-    let all_assays = {};
-    const assay_names = rse.assayNames();
-    for (const aname of assay_names) {
-        all_assays[aname] = rse.assay(aname);
-    }
-
     let sce = new SingleCellExperiment(
-        all_assays,
+        rse.assays(),
         {
             assayOrder: rse.assayNames(),
             rowRanges: rse.rowRanges(),
@@ -72,7 +66,7 @@ export async function readSingleCellExperiment(path, metadata, globals, options 
                 } else {
                     currd = await read_rd(sce.numberOfColumns(), rdpath, rdmeta, globals, options);
                 }
-                sce.$setReducedDimension(rname, currd);
+                sce.setReducedDimension(rname, currd, { inPlace: true });
             }
         }
     }
@@ -96,7 +90,7 @@ export async function readSingleCellExperiment(path, metadata, globals, options 
                 } else {
                     curae = await read_ae(sce.numberOfColumns(), aepath, aemeta, globals, options);
                 }
-                sce.$setAlternativeExperiment(aname, curae);
+                sce.setAlternativeExperiment(aname, curae, { inPlace: true });
             }
         }
     }
