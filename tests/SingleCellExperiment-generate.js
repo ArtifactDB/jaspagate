@@ -31,8 +31,8 @@ let all_types = new bioc.SingleCellExperiment(
                     "whee": new matrix.TestDenseMatrix(20, 5)
                 }
             )
-        }
-
+        },
+        mainExperimentName: "RNA",
     }
 );
 

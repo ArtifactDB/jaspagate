@@ -24,6 +24,8 @@ test("readSingleCellExperiment with full contents", async () => {
 
     expect(sce.alternativeExperimentNames()).toEqual(["foo"]);
     expect(sce.alternativeExperiment(0).numberOfRows()).toEqual(20);
+
+    expect(sce.mainExperimentName()).toBe("RNA");
 })
 
 test("readSingleCellExperiment with an empty object", async () => {
@@ -38,6 +40,8 @@ test("readSingleCellExperiment with an empty object", async () => {
 
     expect(sce.reducedDimensionNames()).toEqual([]);
     expect(sce.alternativeExperimentNames()).toEqual([]);
+
+    expect(sce.mainExperimentName()).toBeNull();
 })
 
 test("readSingleCellExperiment with reduced dimension overrides", async () => {

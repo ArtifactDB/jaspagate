@@ -21,6 +21,8 @@ test_that("saveSingleCellExperiment works with a full object", {
 
     expect_identical(altExpNames(sce), "foo")
     expect_identical(nrow(altExp(sce, 1)), 20L)
+
+    expect_identical(mainExpName(sce), "RNA")
 })
 
 test_that("saveSingleCellExperiment works with empty objects", {
@@ -38,4 +40,6 @@ test_that("saveSingleCellExperiment works with empty objects", {
 
     expect_identical(length(reducedDimNames(sce)), 0L)
     expect_identical(length(altExpNames(sce)), 0L)
+
+    expect_null(mainExpName(sce))
 })

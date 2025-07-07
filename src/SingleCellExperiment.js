@@ -49,6 +49,10 @@ export async function readSingleCellExperiment(path, metadata, globals, options 
         }
     );
 
+    if ("main_experiment_name" in metadata.single_cell_experiment) {
+        sce.setMainExperimentName(metadata.single_cell_experiment.main_experiment_name, { inPlace: true });
+    }
+
     let read_rd = true;
     if ("SingleCellExperiment_readReducedDimension" in options) {
         read_rd = options.SingleCellExperiment_readReducedDimension;
@@ -115,6 +119,10 @@ export async function saveSingleCellExperiment(x, path, globals, options = {}) {
     const existing = await readObjectFile(path, globals);
     existing.type = "single_cell_experiment";
     existing.single_cell_experiment = { "version": "1.0" };
+    let mexp = x.mainExperimentName();
+    if (mexp !== null) {
+        existing.single_cell_experiment.main_experiment_name = mexp;
+    }
     await globals.fs.write(path + "/OBJECT", JSON.stringify(existing));
 
     const reddim_names = x.reducedDimensionNames();
