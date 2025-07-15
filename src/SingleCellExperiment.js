@@ -21,7 +21,7 @@ import { readRangedSummarizedExperiment, saveRangedSummarizedExperiment } from "
  * @param {function|boolean} [options.SingleCellExperiment_readAlternativeExperiment=true] - How to read each alternative experiment.
  * If `true`, {@linkcode readObject} is used, while if `false`, the alternative experiments will be skipped.
  * If a function is provided, it should accept `ncol` (the number of columns in the SingleCellExperiment) as well as `path`, `metadata`, `globals` and `options` (as described above);
- * and should return a {@link external:SummarizedExperiemnt SummarizedExperiment} (possibly asynchronously)
+ * and should return a {@link external:SummarizedExperiment SummarizedExperiment} (possibly asynchronously)
  * for which [`NUMBER_OF_COLUMNS`](https://ltla.github.io/bioconductor.js/global.html#NUMBER_OF_COLUMNS) is equal to `ncol`. 
  *
  * @return {external:SingleCellExperiment} The single-cell experiment object.
