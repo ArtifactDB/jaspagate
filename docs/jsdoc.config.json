@@ -15,7 +15,7 @@
         "scripts": [],
         "menu": {
             "Code Repo": {
-                "href": "https://github.com/ArtifactDB/jaspilite",
+                "href": "https://github.com/ArtifactDB/jaspagate",
                 "target": "_blank",
                 "class": "menu-item",
                 "id": "repository"
