@@ -4,7 +4,7 @@ on:
       - master
   pull_request:
 
-name: Test JS bindings
+name: Run unit tests
 
 env:
   IMAGE_VERSION: master
