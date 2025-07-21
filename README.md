@@ -2,6 +2,7 @@
 
 [![Unit tests](https://github.com/ArtifactDB/jaspagate/actions/workflows/run-tests.yaml/badge.svg)](https://github.com/ArtifactDB/jaspagate/actions/workflows/run-tests.yaml)
 [![Build docs](https://github.com/ArtifactDB/jaspagate/actions/workflows/build-docs.yaml/badge.svg)](https://github.com/ArtifactDB/jaspagate/actions/workflows/build-docs.yaml)
+[![NPM Version](https://img.shields.io/npm/v/jaspagate)](http://npmjs.com/package/jaspagate)
 
 ## Overview
 
