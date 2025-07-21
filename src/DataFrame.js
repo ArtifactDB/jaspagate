@@ -259,7 +259,9 @@ export async function readDataFrame(path, metadata, globals, options = {}) {
         if (handle_stack.length > 0) {
             await globals.h5.close(handle_stack[0]);
         }
-        await globals.fs.clean(contents);
+        if (typeof contents == "string") {
+            await globals.fs.clean(contents);
+        }
     }
 }
 

@@ -29,8 +29,6 @@ export async function readSummarizedExperiment(path, metadata, globals, options 
     }
 
     let handle_stack = [];
-    let contents = await globals.fs.get(path + "/basic_columns.h5");
-
     const se_options = {};
     const assays = {};
     if (await globals.fs.exists(path + "/assays/names.json")) {
