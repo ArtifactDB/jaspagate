@@ -1,6 +1,6 @@
 {
   "name": "jaspagate",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Read and save objects in the takane format. This is a Javascript equivalent to the alabaster (R) and dolomite (Python) frameworks.",
   "author": {
     "name": "Aaron Lun",
@@ -13,7 +13,10 @@
     "test": "NODE_OPTIONS='--experimental-vm-modules' npx jest --testTimeout=1000000 --runInBand",
     "jsdoc": "npx jsdoc -r src README.md -d docs/built -c docs/jsdoc.config.json"
   },
-  "repository": "https://github.com/ArtifactDB/jaspagate",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ArtifactDB/jaspagate.git"
+  },
   "homepage": "https://github.com/ArtifactDB/jaspagate",
   "bugs": "https://github.com/ArtifactDB/jaspagate/issues",
   "dependencies": {
