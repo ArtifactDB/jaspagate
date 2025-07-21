@@ -7,11 +7,17 @@ export class GlobalFsInterface {
     /**
      * @param {string} path - Path to the file.
      * This may be relative or absolute, depending on the application.
+     * The path may refer to a file not on the local filesystem, e.g., on a remote server, inside an archive file.
      * @param {object} [options={}] - Further options.
      * @param {boolean} [options.asBuffer=false] - Whether to return the file contents as a Uint8Array.
      *
-     * @return {Uint8Array|string|Promise<Uint8Array|string>} Path to the file on the local filesystem.
-     * If ``asBuffer = true`` or if no local filesystem is avaiable, this will instead be a Uint8Array of the file contents.
+     * @return {Uint8Array|string|Promise<Uint8Array|string>}
+     * Relative or absolute path to the file on the local filesystem.
+     * Callers should pass this path to {@linkcode GlobalFsInterface#clean clean} once the file is no longer required.
+     *
+     * If `asBuffer = true` or if no local filesystem is available, a Uint8Array of the file contents is returned instead.
+     * This does not need to be passed to `clean`.
+     *
      * A promise of a string or Uint8Array may also be returned.
      */
     get(path, options = {}) {
@@ -19,8 +25,7 @@ export class GlobalFsInterface {
     }
 
     /**
-     * @param {string} path - Path to the file.
-     * This may be relative or absolute, depending on the application.
+     * @param {string} path - Path to the file, see {@linkcode GlobalFsInterface#get get} for details.
      * @return {boolean|Promise<boolean>} Whether the `path` exists.
      */
     exists(path) {
@@ -28,12 +33,12 @@ export class GlobalFsInterface {
     }
 
     /**
-     * @param {string} path - Path to the file.
-     * This may be relative or absolute, depending on the application.
+     * @param {string} path - Path to the file, see {@linkcode GlobalFsInterface#get get} for details.
      * @param {Uint8Array} contents - Contents of the file.
      *
-     * @return {undefined|Promise<undefined>} `contents` should be stored at `path`.
-     * The exact nature of this storage depends on the application.
+     * @return {undefined|Promise<undefined>} `contents` is stored at `path`.
+     * The exact nature of this storage depends on the application -
+     * it may involve saving a file to the local filesystem, or uploading a file to a server, etc.
      * If `path` already exists, it should be overwritten with `contents`.
      * No value is returned, though the method may be asynchronous.
      */
@@ -42,8 +47,9 @@ export class GlobalFsInterface {
     }
 
     /**
-     * @param {string} path - Path to the file, as used in {@linkcode GlobalFsInterface#get get}.
-     * @return {undefined|Promise<undefined>} Any temporary file created by {@linkcode get} for `path` is removed.
+     * @param {string} path - Path to a file on the local filesystem, as returned by {@linkcode GlobalFsInterface#get get}.
+     * @return {undefined|Promise<undefined>} Any resources used by {@linkcode GlobalFsInterface#get get} to return `path` can be freed.
+     * For example, if `path` refers to a temporary file, it can be removed.
      * No value is returned, though the method may be asynchronous.
      */ 
     clean(path) {
@@ -52,6 +58,8 @@ export class GlobalFsInterface {
 
     /**
      * @param {string} path - Path to a directory.
+     * This may be relative or absolute, depending on the application.
+     * As with {@linkcode GlobalFsInterface#get get}, the path may refer to a directory not on the local filesystem, e.g., on a remote server, inside an archive file.
      * It is assumed that all parent directories have already been created.
      * @return {undefined|Promise<undefined>} A new directory is created at `path`.
      * (This may be a no-op if the application does not support creation of directories.)
@@ -69,7 +77,7 @@ export class GlobalFsInterface {
  */
 class GlobalH5Interface {
     /**
-     * @param {string|Uint8Array} contents - Path to a HDF5 file, or a Uint8Array containing the contents of such a file.
+     * @param {string|Uint8Array} contents - Path to a HDF5 file on the local filesystem, or a Uint8Array containing the contents of such a file.
      * The latter may be provided if no filesystem is available.
      * @param {object} [options={}] - Further options.
      * @param {boolean} [options.readOnly=true] - Whether to open the file in read-only mode.
