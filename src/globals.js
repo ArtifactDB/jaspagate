@@ -75,7 +75,7 @@ export class GlobalFsInterface {
  * Applications are expected to implement each of the documented methods.
  * @hideconstructor
  */
-class GlobalH5Interface {
+export class GlobalH5Interface {
     /**
      * @param {string|Uint8Array} contents - Path to a HDF5 file on the local filesystem, or a Uint8Array containing the contents of such a file.
      * The latter may be provided if no filesystem is available.
