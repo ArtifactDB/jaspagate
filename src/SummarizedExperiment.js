@@ -15,7 +15,7 @@ import { readObject, readObjectFile, saveObject } from "./general.js";
  * @param {object} [options={}] - Further options.
  * @param {?function} [options.SummarizedExperiment_readAssay=null] - How to read the assays.
  * If `null`, {@linkcode readObject} is used.
- * If a function is provided, it should accept `nrow` and `ncol` (the number of rows and columns in the data frame, respectively) as well as `path`, `metadata`, `globals` and `options` (as described above);
+ * If a function is provided, it should accept `nrow` and `ncol` (the number of rows and columns in the SummarizedExperiment, respectively) as well as `path`, `metadata`, `globals` and `options` (as described above);
  * and should return an object (possibly asynchronously) for which [`NUMBER_OF_ROWS`](https://ltla.github.io/bioconductor.js/global.html#NUMBER_OF_ROWS) is equal to `nrow`
  * and [`NUMBER_OF_COLUMNS`](https://ltla.github.io/bioconductor.js/global.html#NUMBER_OF_COLUMNS) is equal to `ncol`. 
  *
