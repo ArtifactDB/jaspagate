@@ -3,6 +3,7 @@ import * as df from "./DataFrame.js";
 import * as se from "./SummarizedExperiment.js";
 import * as rse from "./RangedSummarizedExperiment.js";
 import * as sce from "./SingleCellExperiment.js";
+import { joinPath } from "./utils.js";
 
 /**
  * @param {string} path - Path to the takane-formatted object directory containing the {@link DataFrame}.
@@ -11,7 +12,7 @@ import * as sce from "./SingleCellExperiment.js";
  * @async
  */
 export async function readObjectFile(path, globals) {
-    let payload = await globals.fs.get(path + "/OBJECT", { asBuffer: true });
+    let payload = await globals.fs.get(joinPath(path, "OBJECT"), { asBuffer: true });
     let dec = new TextDecoder;
     return JSON.parse(dec.decode(payload));
 }

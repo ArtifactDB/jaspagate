@@ -1,6 +1,7 @@
 import { DataFrame, SummarizedExperiment } from "bioconductor";
 import { H5Group, H5DataSet } from "./h5.js";
 import { readObject, readObjectFile, saveObject } from "./general.js";
+import { joinPath } from "./utils.js";
 
 /**
  * A summarized experiment.

@@ -1,6 +1,7 @@
 import { DataFrame } from "bioconductor";
 import { H5Group, H5DataSet } from "./h5.js";
 import { readObject, readObjectFile, saveObject } from "./general.js";
+import { joinPath } from "./utils.js";
 
 /**
  * A data frame of columnar data.
@@ -28,7 +29,7 @@ export async function readDataFrame(path, metadata, globals, options = {}) {
     } 
 
     let handle_stack = [];
-    let contents = await globals.fs.get(path + "/basic_columns.h5");
+    let contents = await globals.fs.get(joinPath(path, "basic_columns.h5"));
 
     try {
         let fhandle = await globals.h5.open(contents, { readOnly: true });
@@ -52,7 +53,7 @@ export async function readDataFrame(path, metadata, globals, options = {}) {
             let iname = String(i)
             if (kids.indexOf(iname) < 0) {
                 if (read_nested !== false) {
-                    let nest_path = path + "/other_columns/" + iname;
+                    let nest_path = joinPath(path, "other_columns", iname);
                     let nest_meta = await readObjectFile(nest_path, globals);
                     if (read_nested === true) {
                         collected[k] = await readObject(nest_path, nest_meta, globals, options);
@@ -276,12 +277,12 @@ export async function readDataFrame(path, metadata, globals, options = {}) {
  */
 export async function saveDataFrame(x, path, globals, options = {}) {
     await globals.fs.mkdir(path);
-    await globals.fs.write(path + "/OBJECT", JSON.stringify({ type: "data_frame", data_frame: { version: "1.1" } }));
+    await globals.fs.write(joinPath(path, "OBJECT"), JSON.stringify({ type: "data_frame", data_frame: { version: "1.1" } }));
 
     let externals = {};
     let handle_stack = [];
     try {
-        let fhandle = await globals.h5.open(path + "/basic_columns.h5", { readOnly: false });
+        let fhandle = await globals.h5.open(joinPath(path, "basic_columns.h5"), { readOnly: false });
         handle_stack.push(fhandle);
 
         let ghandle = fhandle.createGroup("data_frame");
@@ -505,9 +506,10 @@ export async function saveDataFrame(x, path, globals, options = {}) {
 
     let external_array = Object.entries(externals);
     if (external_array.length > 0) {
-        await globals.fs.mkdir(path + "/other_columns");
+        let other_dir = joinPath(path, "other_columns");
+        await globals.fs.mkdir(other_dir);
         for (const [iname, col] of external_array) {
-            await saveObject(col, path + "/other_columns/" + iname, globals, options);
+            await saveObject(col, joinPath(other_dir, iname), globals, options);
         }
     }
 }

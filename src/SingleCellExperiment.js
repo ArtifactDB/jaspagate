@@ -2,6 +2,7 @@ import { SingleCellExperiment } from "bioconductor";
 import { H5Group, H5DataSet } from "./h5.js";
 import { readObject, readObjectFile, saveObject } from "./general.js";
 import { readRangedSummarizedExperiment, saveRangedSummarizedExperiment } from "./RangedSummarizedExperiment.js"; 
+import { joinPath } from "./utils.js";
 
 /**
  * A single-cell experiment.
@@ -52,13 +53,13 @@ export async function readSingleCellExperiment(path, metadata, globals, options 
         read_rd = options.SingleCellExperiment_readReducedDimension;
     }
     if (read_rd !== false) {
-        const rdpath = path + "/reduced_dimensions/names.json";
+        const rdpath = joinPath(path, "reduced_dimensions/names.json");
         if (await globals.fs.exists(rdpath)) {
             let names_contents = await globals.fs.get(rdpath, { asBuffer: true });
             const dec = new TextDecoder;
             const reddim_names = JSON.parse(dec.decode(names_contents));
             for (const [i, rname] of Object.entries(reddim_names)) {
-                let rdpath = path + "/reduced_dimensions/" + String(i);
+                let rdpath = joinPath(path, "reduced_dimensions", String(i));
                 let rdmeta = await readObjectFile(rdpath, globals);
                 let currd;
                 if (read_rd === true) {
@@ -76,13 +77,13 @@ export async function readSingleCellExperiment(path, metadata, globals, options 
         read_ae = options.SingleCellExperiment_readAlternativeExperiment;
     }
     if (read_ae !== false) {
-        const aepath = path + "/alternative_experiments/names.json";
+        const aepath = joinPath(path, "alternative_experiments/names.json");
         if (await globals.fs.exists(aepath)) {
             let names_contents = await globals.fs.get(aepath, { asBuffer: true });
             const dec = new TextDecoder;
             const altexp_names = JSON.parse(dec.decode(names_contents));
             for (const [i, aname] of Object.entries(altexp_names)) {
-                let aepath = path + "/alternative_experiments/" + String(i);
+                let aepath = joinPath(path, "alternative_experiments", String(i));
                 let aemeta = await readObjectFile(aepath, globals);
                 let curae;
                 if (read_ae === true) {
@@ -117,23 +118,25 @@ export async function saveSingleCellExperiment(x, path, globals, options = {}) {
     if (mexp !== null) {
         existing.single_cell_experiment.main_experiment_name = mexp;
     }
-    await globals.fs.write(path + "/OBJECT", JSON.stringify(existing));
+    await globals.fs.write(joinPath(path, "OBJECT"), JSON.stringify(existing));
 
     const reddim_names = x.reducedDimensionNames();
     if (reddim_names.length > 0) {
-        await globals.fs.mkdir(path + "/reduced_dimensions");
-        await globals.fs.write(path + "/reduced_dimensions/names.json", JSON.stringify(reddim_names));
+        let rddir = joinPath(path, "reduced_dimensions");
+        await globals.fs.mkdir(rddir);
+        await globals.fs.write(joinPath(rddir, "names.json"), JSON.stringify(reddim_names));
         for (const [i, rname] of Object.entries(reddim_names)) {
-            await saveObject(x.reducedDimension(rname), path + "/reduced_dimensions/" + String(i), globals, options);
+            await saveObject(x.reducedDimension(rname), joinPath(rddir, String(i)), globals, options);
         }
     }
 
     const altexp_names = x.alternativeExperimentNames();
     if (altexp_names.length > 0) {
-        await globals.fs.mkdir(path + "/alternative_experiments");
-        await globals.fs.write(path + "/alternative_experiments/names.json", JSON.stringify(altexp_names));
+        let aedir = joinPath(path, "alternative_experiments")
+        await globals.fs.mkdir(aedir);
+        await globals.fs.write(joinPath(aedir, "names.json"), JSON.stringify(altexp_names));
         for (const [i, aname] of Object.entries(altexp_names)) {
-            await saveObject(x.alternativeExperiment(aname), path + "/alternative_experiments/" + String(i), globals, options);
+            await saveObject(x.alternativeExperiment(aname), joinPath(aedir, String(i)), globals, options);
         }
     }
 }
