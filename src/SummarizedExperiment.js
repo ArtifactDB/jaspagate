@@ -32,14 +32,15 @@ export async function readSummarizedExperiment(path, metadata, globals, options 
     let handle_stack = [];
     const se_options = {};
     const assays = {};
-    if (await globals.fs.exists(path + "/assays/names.json")) {
-        let names_contents = await globals.fs.get(path + "/assays/names.json", { asBuffer: true });
+    const name_path = joinPath(path, "assays/names.json");
+    if (await globals.fs.exists(name_path)) {
+        let names_contents = await globals.fs.get(name_path, { asBuffer: true });
         const dec = new TextDecoder;
         const assay_names = JSON.parse(dec.decode(names_contents));
 
         se_options.assayOrder = assay_names;
         for (const [i, aname] of Object.entries(assay_names)) {
-            let assay_path = path + "/assays/" + String(i);
+            let assay_path = joinPath(path, "assays", String(i));
             let assay_meta = await readObjectFile(assay_path, globals);
             if (read_assay === null) {
                 assays[aname] = await readObject(assay_path, assay_meta, globals, options);
@@ -50,16 +51,16 @@ export async function readSummarizedExperiment(path, metadata, globals, options 
         }
     }
 
-    if (await globals.fs.exists(path + "/column_data/OBJECT")) {
-        let cd = await readObject(path + "/column_data", null, globals, options);
+    if (await globals.fs.exists(joinPath(path, "column_data/OBJECT"))) {
+        let cd = await readObject(joinPath(path, "column_data"), null, globals, options);
         se_options.columnData = cd;
         se_options.columnNames = cd.rowNames();
     } else if (Object.keys(assays).length == 0) {
         se_options.columnData = new DataFrame({}, { numberOfRows: 0 });
     }
 
-    if (await globals.fs.exists(path + "/row_data/OBJECT")) {
-        let cd = await readObject(path + "/row_data", null, globals, options);
+    if (await globals.fs.exists(joinPath(path, "row_data/OBJECT"))) {
+        let cd = await readObject(joinPath(path, "row_data"), null, globals, options);
         se_options.rowData = cd;
         se_options.rowNames = cd.rowNames();
     } else if (Object.keys(assays).length == 0) {
@@ -80,7 +81,7 @@ export async function readSummarizedExperiment(path, metadata, globals, options 
  */
 export async function saveSummarizedExperiment(x, path, globals, options = {}) {
     await globals.fs.mkdir(path);
-    await globals.fs.write(path + "/OBJECT", JSON.stringify({
+    await globals.fs.write(joinPath(path, "OBJECT"), JSON.stringify({
         type: "summarized_experiment",
         summarized_experiment: {
             version: "1.0",
@@ -90,20 +91,21 @@ export async function saveSummarizedExperiment(x, path, globals, options = {}) {
 
     const assay_names = x.assayNames();
     if (assay_names.length > 0) {
-        await globals.fs.mkdir(path + "/assays");
-        await globals.fs.write(path + "/assays/names.json", JSON.stringify(assay_names));
+        const adir = joinPath(path, "assays");
+        await globals.fs.mkdir(adir);
+        await globals.fs.write(joinPath(adir, "names.json"), JSON.stringify(assay_names));
         for (const [i, aname] of Object.entries(assay_names)) {
-            await saveObject(x.assay(aname), path + "/assays/" + String(i), globals, options);
+            await saveObject(x.assay(aname), joinPath(adir, String(i)), globals, options);
         }
     }
 
     if (x.columnData().numberOfColumns() > 0 || x.columnNames() !== null) {
         const cd = x.columnData().setRowNames(x.columnNames());
-        await saveObject(cd, path + "/column_data", globals, options);
+        await saveObject(cd, joinPath(path, "column_data"), globals, options);
     }
 
     if (x.rowData().numberOfColumns() > 0 || x.rowNames() !== null) {
         const cd = x.rowData().setRowNames(x.rowNames());
-        await saveObject(cd, path + "/row_data", globals, options);
+        await saveObject(cd, joinPath(path, "row_data"), globals, options);
     }
 }
