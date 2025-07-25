@@ -25,6 +25,8 @@ test("readDataFrame with different types", async () => {
     expect(df.column(4)).toEqual(expected_vls);
 
     expect(df.column(5)).toEqual([true,false,true,false,true,false,true,false,true,false]);
+
+    expect(df.metadata().length()).toEqual(0);
 })
 
 test("readDataFrame with missing values", async () => {
@@ -71,4 +73,25 @@ test("readDataFrame with non-atomic columns", async () => {
 
     let df3 = await jsp.readObject("artifacts/DataFrame-nested", null, test_globals, { DataFrame_readNested: false });
     expect(df3.columnNames()).toEqual(["Y"])
+})
+
+test("readDataFrame with metadata", async () => {
+    let df = await jsp.readObject("artifacts/DataFrame-metadata", null, test_globals);
+    let meta = df.metadata();
+    expect(meta.names()).toEqual(["foo", "bar"]);
+    expect(meta.get(0).toArray()).toEqual([1]);
+    expect(meta.get(1).toArray()).toEqual(["A","B","C"]);
+
+    df = await jsp.readObject("artifacts/DataFrame-metadata", null, test_globals, { DataFrame_readMetadata: false });
+    expect(df.metadata().length()).toEqual(0);
+
+    df = await jsp.readObject("artifacts/DataFrame-metadata", null, test_globals, { DataFrame_readMetadata: true });
+    expect(df.metadata().names()).toEqual(["foo", "bar"]);
+
+    df = await jsp.readObject("artifacts/DataFrame-metadata", null, test_globals, {
+        DataFrame_readMetadata: (path, metadata, globals, options) => {
+            return new bioc.List([42,69]);
+        }
+    });
+    expect(df.metadata().toArray()).toEqual([42,69]);
 })

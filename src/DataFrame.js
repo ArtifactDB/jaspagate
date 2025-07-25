@@ -2,6 +2,7 @@ import { DataFrame } from "bioconductor";
 import { H5Group, H5DataSet } from "./h5.js";
 import { readObject, readObjectFile, saveObject } from "./general.js";
 import { joinPath } from "./utils.js";
+import { readAnnotatedMetadata, saveAnnotatedMetadata } from "./metadata.js";
 
 /**
  * A data frame of columnar data.
@@ -18,6 +19,9 @@ import { joinPath } from "./utils.js";
  * If `true`, {@linkcode readObject} is used, while if `false`, nested objects will be skipped.
  * If a function is provided, it should accept `nrow` (the number of rows in the data frame) as well as `path`, `metadata`, `globals` and `options` (as described above);
  * and should return an object (possibly asynchronously) for which [`NUMBER_OF_ROWS`](https://ltla.github.io/bioconductor.js/global.html#NUMBER_OF_ROWS) is equal to `nrow`. 
+ * @param {function|boolean} [options.DataFrame_readMetadata=true] - How to read the metadata.
+ * If `true`, {@linkcode readObject} is used, while if `false`, metadata will be skipped.
+ * If a function is provided, it should accept `path`, `metadata`, `globals` and `options` (as described above), and return a {@link external:List List}.
  *
  * @return {external:DataFrame} The data frame.
  * @async
@@ -251,7 +255,8 @@ export async function readDataFrame(path, metadata, globals, options = {}) {
             colnames = new_colnames;
         }
 
-        return new DataFrame(collected, { columnOrder: colnames, numberOfRows: nrows, rowNames: rownames });
+        let metadata = await readAnnotatedMetadata(joinPath(path, "other_annotations"), globals, options, "DataFrame_readMetadata")
+        return new DataFrame(collected, { columnOrder: colnames, numberOfRows: nrows, rowNames: rownames, metadata: metadata });
 
     } finally {
         for (const handle of handle_stack.toReversed()) {
@@ -512,4 +517,6 @@ export async function saveDataFrame(x, path, globals, options = {}) {
             await saveObject(col, joinPath(other_dir, iname), globals, options);
         }
     }
+
+    await saveAnnotatedMetadata(x.metadata(), joinPath(path, "other_annotations"), globals, options);
 }

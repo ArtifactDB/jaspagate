@@ -74,3 +74,17 @@ if (fs.existsSync(path)) {
     fs.rmSync(path, { recursive: true, force: true });
 }
 jsp.saveObject(nested, path, test_globals);
+
+/*******************************/
+
+let hasmeta = new bioc.DataFrame(
+    { "whee": new Int32Array([1,2,3,4,5,6,7,8,9,10]) },
+    { metadata: new bioc.List({ foo: 1, bar: [ "A", "B", "C" ] }) }
+);
+
+path = "artifacts2/DataFrame-metadata";
+if (fs.existsSync(path)) {
+    fs.rmSync(path, { recursive: true, force: true });
+}
+jsp.saveObject(hasmeta, path, test_globals);
+

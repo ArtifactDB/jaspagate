@@ -2,6 +2,7 @@ import { DataFrame, SummarizedExperiment } from "bioconductor";
 import { H5Group, H5DataSet } from "./h5.js";
 import { readObject, readObjectFile, saveObject } from "./general.js";
 import { joinPath } from "./utils.js";
+import { readAnnotatedMetadata, saveAnnotatedMetadata } from "./metadata.js";
 
 /**
  * A summarized experiment.
@@ -19,6 +20,9 @@ import { joinPath } from "./utils.js";
  * If a function is provided, it should accept `nrow` and `ncol` (the number of rows and columns in the SummarizedExperiment, respectively) as well as `path`, `metadata`, `globals` and `options` (as described above);
  * and should return an object (possibly asynchronously) for which [`NUMBER_OF_ROWS`](https://ltla.github.io/bioconductor.js/global.html#NUMBER_OF_ROWS) is equal to `nrow`
  * and [`NUMBER_OF_COLUMNS`](https://ltla.github.io/bioconductor.js/global.html#NUMBER_OF_COLUMNS) is equal to `ncol`. 
+ * @param {function|boolean} [options.SummarizedExperiment_readMetadata=true] - How to read the metadata.
+ * If `true`, {@linkcode readObject} is used, while if `false`, metadata will be skipped.
+ * If a function is provided, it should accept `path`, `metadata`, `globals` and `options` (as described above), and return a {@link external:List List}.
  *
  * @return {external:SummarizedExperiment} The summarized experiment object.
  * @async
@@ -67,6 +71,7 @@ export async function readSummarizedExperiment(path, metadata, globals, options 
         se_options.rowData = new DataFrame({}, { numberOfRows: 0 });
     }
 
+    se_options.metadata = await readAnnotatedMetadata(joinPath(path, "other_data"), globals, options, "SummarizedExperiment_readMetadata")
     return new SummarizedExperiment(assays, se_options);
 }
 
@@ -108,4 +113,6 @@ export async function saveSummarizedExperiment(x, path, globals, options = {}) {
         const cd = x.rowData().setRowNames(x.rowNames());
         await saveObject(cd, joinPath(path, "row_data"), globals, options);
     }
+
+    await saveAnnotatedMetadata(x.metadata(), joinPath(path, "other_data"), globals, options);
 }

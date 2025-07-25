@@ -10,7 +10,8 @@ se <- SummarizedExperiment(
         logcounts = matrix(rnorm(1000), ncol=10)
     ),
     rowData = DataFrame(row.names=sprintf("GENE_%s", seq_len(100)), symbol=sprintf("SYM_%s", seq_len(100))),
-    colData = DataFrame(row.names=letters[1:10], label=LETTERS[1:10])
+    colData = DataFrame(row.names=letters[1:10], label=LETTERS[1:10]),
+    metadata = list(foo=1, bar=LETTERS[1:3])
 )
 
 path <- "artifacts/SummarizedExperiment-full"

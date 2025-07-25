@@ -1,4 +1,4 @@
-# library(testthat); source("DataFrame-read.R")
+# library(testthat); source("tests/DataFrame-read.R")
 
 library(alabaster.base)
 
@@ -43,4 +43,10 @@ test_that("saveDataFrame works with nested objects", {
     expect_identical(df$X$foo, 1:10)
     expect_identical(df$X$bar, letters[1:10])
     expect_identical(df$Y, LETTERS[1:10])
+})
+
+test_that("saveDataFrame works with metadata", {
+    validateObject("artifacts2/DataFrame-metadata")
+    df <- readObject("artifacts2/DataFrame-metadata")
+    expect_identical(S4Vectors::metadata(df), list(foo=1, bar=LETTERS[1:3]))
 })

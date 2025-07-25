@@ -39,14 +39,13 @@ Check out the [reference documentation](https://artifactdb.github.io/jaspagate) 
 
 Currently, we only support a small number of **takane** formats.
 
+- `list` objects are loaded as [`List`](https://ltla.github.io/bioconductor.js/List.html) instances.
 - `data_frame` objects are loaded as [`DataFrame`](https://ltla.github.io/bioconductor.js/DataFrame.html) instances, with the following caveats:
   - Annotations on the columns are not loaded.
-  - Metadata is not loaded or saved.
 - `summarized_experiment` objects are loaded as [`SummarizedExperiment`](https://ltla.github.io/bioconductor.js/SummarizedExperiment.html) instances, with the following caveats:
   - To read or save assays, each application should define and register their own functions
     in [`readObjectRegistry`](https://artifactdb.github.io/jaspagate/readObjectRegistry) and [`saveObjectRegistry`](https://artifactdb.github.io/jaspagate/saveObjectRegistry).
     This ensures that large datasets are directly converted to application-specific representations for optimal efficiency.
-  - Metadata is not loaded or saved.
 - `ranged_summarized_experiment` objects are loaded as [`RangedSummarizedExperiment`](https://ltla.github.io/bioconductor.js/RangedSummarizedExperiment.html) instances, with the following caveats:
   - Everything mentioned for `summarized_experiment`.
   - Non-empty row ranges are not loaded or saved.

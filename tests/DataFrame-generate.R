@@ -36,3 +36,11 @@ nested <- DataFrame(X=I(DataFrame(foo=1:10, bar=letters[1:10])), Y=LETTERS[1:10]
 path <- "artifacts/DataFrame-nested"
 unlink(path, recursive=TRUE)
 saveObject(nested, path)
+
+##############################
+
+hasmeta <- DataFrame(X=1:10)
+metadata(hasmeta) <- list(foo=1, bar=LETTERS[1:3])
+path <- "artifacts/DataFrame-metadata"
+unlink(path, recursive=TRUE)
+saveObject(hasmeta, path)

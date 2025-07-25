@@ -17,6 +17,15 @@ test("readSummarizedExperiment with full contents", async () => {
 
     expect(se.rowData().columnNames()).toEqual(["symbol"]);
     expect(se.columnData().columnNames()).toEqual(["label"]);
+
+    let meta = se.metadata();
+    expect(meta.names()).toEqual(["foo", "bar"]);
+    expect(meta.get(0).toArray()).toEqual([1]);
+    expect(meta.get(1).toArray()).toEqual(["A","B","C"]);
+
+    // Checking that the metadata bypasses work correctly.
+    se = await jsp.readObject("artifacts/SummarizedExperiment-full", null, test_globals, { SummarizedExperiment_readMetadata: false });
+    expect(se.metadata().length()).toEqual(0);
 })
 
 test("readSummarizedExperiment with an empty object", async () => {

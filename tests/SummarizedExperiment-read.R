@@ -14,6 +14,8 @@ test_that("saveSummarizedExperiment works with a full object", {
     expect_identical(colnames(se), sprintf("sample_%s", seq_len(ncol(se))))
     expect_identical(rowData(se)$symbol, letters[1:10])
     expect_identical(colData(se)$label, paste0("foo_", letters[1:5]))
+
+    expect_identical(S4Vectors::metadata(se), list(foo=1, bar=LETTERS[1:3]))
 })
 
 test_that("saveSummarizedExperiment works with empty objects", {

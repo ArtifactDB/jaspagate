@@ -10,7 +10,7 @@ if (!fs.existsSync("artifacts2")) {
 
 /*******************************/
 
-let all_types = new bioc.SummarizedExperiment(
+let full = new bioc.SummarizedExperiment(
     {
         "counts": new matrix.TestDenseMatrix(10, 5),
         "logcounts": new matrix.TestDenseMatrix(10, 5)
@@ -20,7 +20,8 @@ let all_types = new bioc.SummarizedExperiment(
         rowData: new bioc.DataFrame({ "symbol": ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"] }),
         columnData: new bioc.DataFrame({ "label": ["foo_a","foo_b","foo_c","foo_d","foo_e"] }),
         rowNames: ["gene_1","gene_2","gene_3","gene_4","gene_5","gene_6","gene_7","gene_8","gene_9","gene_10"],
-        columnNames: ["sample_1","sample_2","sample_3","sample_4","sample_5"]
+        columnNames: ["sample_1","sample_2","sample_3","sample_4","sample_5"],
+        metadata: { foo: 1, bar: ["A", "B", "C" ] }
     }
 );
 
@@ -28,7 +29,7 @@ let path = "artifacts2/SummarizedExperiment-full";
 if (fs.existsSync(path)) {
     fs.rmSync(path, { recursive: true, force: true });
 }
-jsp.saveObject(all_types, path, test_globals);
+jsp.saveObject(full, path, test_globals);
 
 /*******************************/
 
