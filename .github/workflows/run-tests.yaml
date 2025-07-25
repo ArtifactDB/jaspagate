@@ -35,21 +35,19 @@ jobs:
         deps <- readLines("tests/r-dependencies.txt")
         BiocManager::install(deps)
 
-    - name: Cache artifacts from R
-      id: cache-artifacts-from-r
-      uses: actions/cache@v4
-      with:
-        path: artifacts
-        key: r-${{ hashFiles('tests/*-generate.R') }}
-
     - name: Build artifacts from R
-      if: steps.cache-artifacts-from-r.outputs.cache-hit != 'true'
       shell: Rscript {0}
       run: |
         for (fname in list.files("tests", pattern="-generate.R$")) {
           cat("Currently running", fname, "\n")
           source(file.path("tests", fname))
         }
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: artifacts-from-r
+        path: artifacts
 
   test-read-in-js:
     runs-on: ubuntu-latest
@@ -73,11 +71,11 @@ jobs:
     - name: Update NPM packages
       run: npm i --include=dev
 
-    - name: Cache artifacts from R
-      uses: actions/cache@v4
+    - name: Fetch artifacts from R
+      uses: actions/download-artifact@v4
       with:
+        name: artifacts-from-r
         path: artifacts
-        key: r-${{ hashFiles('tests/*-generate.R') }}
 
     - name: Run tests
       run: npm run test
@@ -103,19 +101,18 @@ jobs:
     - name: Update NPM packages
       run: npm i --include=dev
 
-    - name: Cache artifacts from Javascript
-      id: cache-artifacts-from-js
-      uses: actions/cache@v4
-      with:
-        path: artifacts2
-        key: js-${{ hashFiles('tests/*-generate.js') }}
-
     - name: Build artifacts from Javascript
       if: steps.cache-artifacts-from-js.outputs.cache-hit != 'true'
       run: |
         for fname in $(ls tests/*-generate.js); do
           node $fname
         done
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: artifacts-from-js
+        path: artifacts2
 
   test-read-in-r:
     runs-on: ubuntu-latest
@@ -142,11 +139,11 @@ jobs:
         deps <- readLines("tests/r-dependencies.txt")
         BiocManager::install(deps)
 
-    - name: Cache artifacts from Javascript
-      uses: actions/cache@v4
+    - name: Fetch artifacts from Javascript
+      uses: actions/download-artifact@v4
       with:
+        name: artifacts-from-js
         path: artifacts2
-        key: js-${{ hashFiles('tests/*-generate.js') }}
 
     - name: Build artifacts from R
       shell: Rscript {0}
