@@ -17,11 +17,17 @@ export const test_globals = {
         mkdir: path => fs.mkdirSync(path)
     },
     h5: {
-        open: async function(path, { readOnly }) {
+        open: async function(path) {
             await hdf5.ready;
-            let handle = new hdf5.File(path, readOnly ? "r" : "w");
+            let handle = new hdf5.File(path, "r");
             return new TestH5Group(handle);
         },
-        close: (handle) => {} // no-op.
+        close: (handle) => {}, // no-op.
+        create: async function(path) {
+            await hdf5.ready;
+            let handle = new hdf5.File(path, "w");
+            return new TestH5Group(handle);
+        },
+        finalize: (handle, failed) => null // no-op.
     }
 };

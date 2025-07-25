@@ -36,7 +36,7 @@ export async function readDataFrame(path, metadata, globals, options = {}) {
     let contents = await globals.fs.get(joinPath(path, "basic_columns.h5"));
 
     try {
-        let fhandle = await globals.h5.open(contents, { readOnly: true });
+        let fhandle = await globals.h5.open(contents); 
         handle_stack.push(fhandle);
         let ghandle = fhandle.open("data_frame");
         handle_stack.push(ghandle);
@@ -286,8 +286,11 @@ export async function saveDataFrame(x, path, globals, options = {}) {
 
     let externals = {};
     let handle_stack = [];
+    let h5outpath = joinPath(path, "basic_columns.h5");
+    let success = false;
+
     try {
-        let fhandle = await globals.h5.open(joinPath(path, "basic_columns.h5"), { readOnly: false });
+        let fhandle = await globals.h5.create(h5outpath);
         handle_stack.push(fhandle);
 
         let ghandle = fhandle.createGroup("data_frame");
@@ -500,12 +503,16 @@ export async function saveDataFrame(x, path, globals, options = {}) {
             }
         }
 
+        success = true;
     } finally {
         for (const handle of handle_stack.toReversed()) {
             handle.close();
         }
         if (handle_stack.length > 0) {
-            await globals.h5.close(handle_stack[0]);
+            let payload = await globals.h5.finalize(handle_stack[0], !success);
+            if (payload !== null) {
+                await globals.fs.write(h5outpath, payload);
+            }
         }
     }
 

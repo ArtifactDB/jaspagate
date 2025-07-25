@@ -79,13 +79,10 @@ export class GlobalH5Interface {
     /**
      * @param {string|Uint8Array} contents - Path to a HDF5 file on the local filesystem, or a Uint8Array containing the contents of such a file.
      * The latter may be provided if no filesystem is available.
-     * @param {object} [options={}] - Further options.
-     * @param {boolean} [options.readOnly=true] - Whether to open the file in read-only mode.
-     * If `false` and the file does not already exist, a new file will be created. 
      *
-     * @return {H5Group|Promise<H5Group>} A handle to the HDF5 file, or a promise thereof.
+     * @return {H5Group|Promise<H5Group>} A read-only handle to the HDF5 file, or a promise thereof.
      */
-    open(x, options = {}) {
+    open(contents) {
         throw new Error("'open()' is not implemented in this GlobalH5Interface subclass");
     }
 
@@ -97,5 +94,33 @@ export class GlobalH5Interface {
      */
     close(handle) {
         throw new Error("'close()' is not implemented in this GlobalH5Interface subclass");
+    }
+
+    /**
+     * @param {string} path - Path to a HDF5 file to be created on the local filesystem.
+     * This may be ignored if no local filesystem exists.
+     *
+     * @return {H5Group|Promise<H5Group>} A read-write handle to a new HDF5 file, or a promise thereof.
+     * This may refer to, e.g.,  a temporary file in a virtual filesystem, if no local filesystem exists.
+     */
+    create(path) {
+        throw new Error("'create()' is not implemented in this GlobalH5Interface subclass");
+    }
+
+    /**
+     * @param {H5Group} handle - Return value of {@linkcode GlobalH5Interface#create create}.
+     * This will already have its {@linkcode H5Group#close close} method invoked.
+     * @param {boolean} failed - Whether an error occurred when writing to the HDF5 file. 
+     *
+     * @return {?Uint8Array|Promise<?Uint8Array>} This should execute clean-up operations when no more write operations are to be performed on the file returned by `create`.
+     *
+     * If `failed = true`, any existing resources associated with the file may be deleted, and `null` should be returned, possibly asynchronously.
+     *
+     * If `failed = false` and `path` was used in {@linkcode GlobalH5Interface#create create}, `null` should be returned, possibly asynchronously.
+     * Otherwise, if `path` was not used in {@linkcode GlobalH5Interface#create create}, a Uint8Array (or a promise thereof) with the contents of the HDF5 file should be returned,
+     * typically for use in {linkcode GlobalFsInterface#write GlobalFsInterface.write}.
+     */
+    finalize(handle) {
+        throw new Error("'finalize()' is not implemented in this GlobalH5Interface subclass");
     }
 }
