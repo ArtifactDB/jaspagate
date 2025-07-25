@@ -50,3 +50,11 @@ test_that("saveDataFrame works with metadata", {
     df <- readObject("artifacts2/DataFrame-metadata")
     expect_identical(S4Vectors::metadata(df), list(foo=1, bar=LETTERS[1:3]))
 })
+
+test_that("saveDataFrame works with custom objects", {
+    validateObject("artifacts2/DataFrame-custom")
+    df <- readObject("artifacts2/DataFrame-custom")
+    expect_identical(df$whee, logical(5))
+    expect_s4_class(df$X, "DFrame")
+    expect_identical(df$X$Y, c(1,2,3,4,5))
+})

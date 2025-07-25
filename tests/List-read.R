@@ -90,3 +90,11 @@ test_that("saveList works with external", {
     expect_identical(ll[[2]], 1:5*1.0)
     expect_identical(ll[[3]], list(LETTERS[1:3], S4Vectors::DataFrame(B=1:5*1.0)))
 })
+
+test_that("saveList works with custom", {
+    validateObject("artifacts2/List-custom")
+    ll <- readObject("artifacts2/List-custom")
+
+    expect_identical(ll[[1]], S4Vectors::DataFrame(A=1:5*1.0))
+    expect_identical(ll[[2]], c(foobar=12345678L))
+})

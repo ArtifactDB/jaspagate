@@ -156,3 +156,26 @@ if (fs.existsSync(path)) {
     fs.rmSync(path, { recursive: true, force: true });
 }
 jsp.saveObject(external, path, test_globals);
+
+/*******************************/
+
+class Thingy {};
+
+let custom = new bioc.List([
+    new bioc.DataFrame({A: [1,2,3,4,5] }),
+    new Thingy
+])
+
+path = "artifacts2/List-custom"
+if (fs.existsSync(path)) {
+    fs.rmSync(path, { recursive: true, force: true });
+}
+jsp.saveObject(custom, path, test_globals, { 
+    List_saveOther: y => {
+        if (y instanceof Thingy) {
+            return { "type": "integer", "values": 12345678, "names": ["foobar"] };
+        } else {
+            return null;
+        }
+    }
+});

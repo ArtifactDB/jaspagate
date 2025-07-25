@@ -88,3 +88,35 @@ if (fs.existsSync(path)) {
 }
 jsp.saveObject(hasmeta, path, test_globals);
 
+/*******************************/
+
+class Thingy {
+    #n;
+    constructor(n) {
+        this.#n = n;
+    }
+    _bioconductor_LENGTH() {
+        return this.#n;
+    }
+};
+
+let custom = new bioc.DataFrame({
+    "whee": new Thingy(5),
+    "X": new bioc.DataFrame({ "Y": [1,2,3,4,5] }) // adding this as a control.
+});
+
+path = "artifacts2/DataFrame-custom";
+if (fs.existsSync(path)) {
+    fs.rmSync(path, { recursive: true, force: true });
+}
+jsp.saveObject(custom, path, test_globals, {
+    DataFrame_saveOther: (y, handle, name) => {
+        if (y instanceof Thingy) {
+            let xhandle = handle.createDataSet(name, "Int8", [bioc.LENGTH(y)], { data: new Int8Array(bioc.LENGTH(y)) }); 
+            xhandle.writeAttribute("type", "String", [], ["boolean"]);
+            return true;
+        } else {
+            return false;
+        }
+    }
+});

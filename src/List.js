@@ -244,6 +244,13 @@ async function dump_json_list(x, path, globals, options, state) {
         return { "type": "boolean", "values": x };
 
     } else {
+        if ("List_saveOther" in options) {
+            let converted = options.List_saveOther(x);
+            if (converted !== null) {
+                return converted;
+            }
+        }
+
         let odir = joinPath(path, "other_contents");
         if (!(await globals.fs.exists(odir))) {
             await globals.fs.mkdir(odir);
@@ -260,6 +267,9 @@ async function dump_json_list(x, path, globals, options, state) {
  * @param {string} path - Path to the directory in which to save `x`.
  * @param {object} globals - Object containing `fs`, an object satisfying the {@link GlobalFsInterface}; and `h5`, an object satisfying the {@link GlobalH5Interface}.
  * @param {object} [options={}] - Further options.
+ * @param {function} [?options.List_saveOther=null] - Function to save custom class instances within a list, without resorting to a reference to an external object.
+ * This should accept `y`, an instance of a custom object, and return an object containing the contents of `y` in the **uzuki2** JSON format.
+ * If the class of `y` is not supported, `null` should be returned instead.
  *
  * @return `x` is stored at `path`.
  * @async

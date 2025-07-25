@@ -1,4 +1,4 @@
-import { DataFrame } from "bioconductor";
+import { DataFrame, List } from "bioconductor";
 import { H5Group, H5DataSet } from "./h5.js";
 import { readObject, readObjectFile, saveObject } from "./general.js";
 import { joinPath } from "./utils.js";
@@ -276,6 +276,9 @@ export async function readDataFrame(path, metadata, globals, options = {}) {
  * @param {string} path - Path to the directory in which to save `x`.
  * @param {object} globals - Object containing `fs`, an object satisfying the {@link GlobalFsInterface}; and `h5`, an object satisfying the {@link GlobalH5Interface}.
  * @param {object} [options={}] - Further options.
+ * @param {function} [?options.DataFrame_saveOther=null] - Function to save custom class instances as columns of a data frame, without resorting to a reference to an external object.
+ * This should accept `y`, an instance of a custom object; `handle`, the {@link H5Group} in which `y` is to be saved; and `name`, the name of the child of `handle` in which to save `y`. 
+ * It should return `true` if `y` was saved and `false` otherwise (e.g., if it does not know how to handle the class of`y`).
  *
  * @return `x` is stored at `path`.
  * @async
@@ -499,7 +502,13 @@ export async function saveDataFrame(x, path, globals, options = {}) {
                 }
 
             } else {
-                externals[iname] = col;
+                let handled = false;
+                if ("DataFrame_saveOther" in options) {
+                    handled = options.DataFrame_saveOther(col, dhandle, iname);
+                }
+                if (!handled) {
+                    externals[iname] = col;
+                }
             }
         }
 
