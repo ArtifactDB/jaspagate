@@ -459,7 +459,7 @@ These should not have leading or trailing <code>/</code> but may be equal to <co
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="DataFrame.js.html">DataFrame.js</a>, <a href="DataFrame.js.html#line25">line 25</a>
+        <a href="DataFrame.js.html">DataFrame.js</a>, <a href="DataFrame.js.html#line29">line 29</a>
     </li></ul></dd>
     
 
@@ -746,6 +746,51 @@ These should not have leading or trailing <code>/</code> but may be equal to <co
 If <code>true</code>, <a href="global.html#readObject"><code>readObject</code></a> is used, while if <code>false</code>, nested objects will be skipped.
 If a function is provided, it should accept <code>nrow</code> (the number of rows in the data frame) as well as <code>path</code>, <code>metadata</code>, <code>globals</code> and <code>options</code> (as described above);
 and should return an object (possibly asynchronously) for which <a href="https://ltla.github.io/bioconductor.js/global.html#NUMBER_OF_ROWS"><code>NUMBER_OF_ROWS</code></a> is equal to <code>nrow</code>.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>DataFrame_readMetadata</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+|
+
+<span class="param-type">boolean</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    <code>true</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>How to read the metadata.
+If <code>true</code>, <a href="global.html#readObject"><code>readObject</code></a> is used, while if <code>false</code>, metadata will be skipped.
+If a function is provided, it should accept <code>path</code>, <code>metadata</code>, <code>globals</code> and <code>options</code> (as described above), and return a <a href="external-List.html">List</a>.</p></td>
         </tr>
 
     
@@ -2252,7 +2297,7 @@ for which <a href="https://ltla.github.io/bioconductor.js/global.html#NUMBER_OF_
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="SummarizedExperiment.js.html">SummarizedExperiment.js</a>, <a href="SummarizedExperiment.js.html#line26">line 26</a>
+        <a href="SummarizedExperiment.js.html">SummarizedExperiment.js</a>, <a href="SummarizedExperiment.js.html#line30">line 30</a>
     </li></ul></dd>
     
 
@@ -2542,6 +2587,51 @@ and <a href="https://ltla.github.io/bioconductor.js/global.html#NUMBER_OF_COLUMN
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>SummarizedExperiment_readMetadata</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+|
+
+<span class="param-type">boolean</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    <code>true</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>How to read the metadata.
+If <code>true</code>, <a href="global.html#readObject"><code>readObject</code></a> is used, while if <code>false</code>, metadata will be skipped.
+If a function is provided, it should accept <code>path</code>, <code>metadata</code>, <code>globals</code> and <code>options</code> (as described above), and return a <a href="external-List.html">List</a>.</p></td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -2611,7 +2701,7 @@ and <a href="https://ltla.github.io/bioconductor.js/global.html#NUMBER_OF_COLUMN
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="DataFrame.js.html">DataFrame.js</a>, <a href="DataFrame.js.html#line278">line 278</a>
+        <a href="DataFrame.js.html">DataFrame.js</a>, <a href="DataFrame.js.html#line283">line 283</a>
     </li></ul></dd>
     
 
@@ -3971,7 +4061,7 @@ If found, it will use that function, otherwise it will fall back to the default 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="SummarizedExperiment.js.html">SummarizedExperiment.js</a>, <a href="SummarizedExperiment.js.html#line82">line 82</a>
+        <a href="SummarizedExperiment.js.html">SummarizedExperiment.js</a>, <a href="SummarizedExperiment.js.html#line87">line 87</a>
     </li></ul></dd>
     
 
@@ -4243,7 +4333,7 @@ If found, it will use that function, otherwise it will fall back to the default 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.4</a> on Fri Jul 25 2025 02:32:34 GMT+0000 (Coordinated Universal Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.4</a> on Fri Jul 25 2025 17:50:12 GMT+0000 (Coordinated Universal Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>
