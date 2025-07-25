@@ -20,7 +20,7 @@
   "homepage": "https://github.com/ArtifactDB/jaspagate",
   "bugs": "https://github.com/ArtifactDB/jaspagate/issues",
   "dependencies": {
-    "bioconductor": "^0.4.0"
+    "bioconductor": "^0.4.1"
   },
   "devDependencies": {
     "docdash": "^2.0.1",

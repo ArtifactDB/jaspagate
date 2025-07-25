@@ -1,4 +1,5 @@
 import * as bioc from "bioconductor";
+import * as list from "./List.js";
 import * as df from "./DataFrame.js";
 import * as se from "./SummarizedExperiment.js";
 import * as rse from "./RangedSummarizedExperiment.js";
@@ -53,6 +54,7 @@ export async function readObject(path, metadata, globals, options = {}) {
 
     } else {
         const defaults = {
+            "simple_list": list.readList,
             "data_frame": df.readDataFrame,
             "summarized_experiment": se.readSummarizedExperiment,
             "ranged_summarized_experiment": rse.readRangedSummarizedExperiment,
@@ -106,7 +108,8 @@ export async function saveObject(x, path, globals, options = {}) {
         [bioc.SingleCellExperiment, sce.saveSingleCellExperiment],
         [bioc.RangedSummarizedExperiment, rse.saveRangedSummarizedExperiment],
         [bioc.SummarizedExperiment, se.saveSummarizedExperiment],
-        [bioc.DataFrame, df.saveDataFrame]
+        [bioc.DataFrame, df.saveDataFrame],
+        [bioc.List, list.saveList]
     ];
 
     for (const [cls, fun] of defaults) {
