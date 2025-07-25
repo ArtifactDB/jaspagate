@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>List.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    
+    <h2><a href="index.html">Home</a></h2><h2><a href="https://github.com/ArtifactDB/jaspagate" target="_blank" class="menu-item" id="repository" >Code Repo</a></h2><h3>Classes</h3><ul><li><a href="GlobalFsInterface.html">GlobalFsInterface</a><ul class='methods'><li data-type='method' style='display: none;'><a href="GlobalFsInterface.html#clean">clean</a></li><li data-type='method' style='display: none;'><a href="GlobalFsInterface.html#exists">exists</a></li><li data-type='method' style='display: none;'><a href="GlobalFsInterface.html#get">get</a></li><li data-type='method' style='display: none;'><a href="GlobalFsInterface.html#mkdir">mkdir</a></li><li data-type='method' style='display: none;'><a href="GlobalFsInterface.html#write">write</a></li></ul></li><li><a href="GlobalH5Interface.html">GlobalH5Interface</a><ul class='methods'><li data-type='method' style='display: none;'><a href="GlobalH5Interface.html#close">close</a></li><li data-type='method' style='display: none;'><a href="GlobalH5Interface.html#open">open</a></li></ul></li><li><a href="H5DataSet.html">H5DataSet</a><ul class='methods'><li data-type='method' style='display: none;'><a href="H5DataSet.html#close">close</a></li><li data-type='method' style='display: none;'><a href="H5DataSet.html#readAttribute">readAttribute</a></li><li data-type='method' style='display: none;'><a href="H5DataSet.html#shape">shape</a></li><li data-type='method' style='display: none;'><a href="H5DataSet.html#type">type</a></li><li data-type='method' style='display: none;'><a href="H5DataSet.html#values">values</a></li><li data-type='method' style='display: none;'><a href="H5DataSet.html#write">write</a></li></ul></li><li><a href="H5Group.html">H5Group</a><ul class='methods'><li data-type='method' style='display: none;'><a href="H5Group.html#children">children</a></li><li data-type='method' style='display: none;'><a href="H5Group.html#close">close</a></li><li data-type='method' style='display: none;'><a href="H5Group.html#createDataSet">createDataSet</a></li><li data-type='method' style='display: none;'><a href="H5Group.html#createGroup">createGroup</a></li><li data-type='method' style='display: none;'><a href="H5Group.html#open">open</a></li><li data-type='method' style='display: none;'><a href="H5Group.html#readAttribute">readAttribute</a></li><li data-type='method' style='display: none;'><a href="H5Group.html#writeAttribute">writeAttribute</a></li></ul></li></ul><h3>Externals</h3><ul><li><a href="external-DataFrame.html">external:DataFrame</a></li><li><a href="external-List.html">external:List</a></li><li><a href="external-RangedSummarizedExperiment.html">external:RangedSummarizedExperiment</a></li><li><a href="external-SingleCellExperiment.html">external:SingleCellExperiment</a></li><li><a href="external-SummarizedExperiment.html">external:SummarizedExperiment</a></li></ul><h3>Global</h3><ul><li><a href="global.html#joinPath">joinPath</a></li><li><a href="global.html#readDataFrame">readDataFrame</a></li><li><a href="global.html#readList">readList</a></li><li><a href="global.html#readObject">readObject</a></li><li><a href="global.html#readObjectFile">readObjectFile</a></li><li><a href="global.html#readObjectRegistry">readObjectRegistry</a></li><li><a href="global.html#readRangedSummarizedExperiment">readRangedSummarizedExperiment</a></li><li><a href="global.html#readSingleCellExperiment">readSingleCellExperiment</a></li><li><a href="global.html#readSummarizedExperiment">readSummarizedExperiment</a></li><li><a href="global.html#saveDataFrame">saveDataFrame</a></li><li><a href="global.html#saveList">saveList</a></li><li><a href="global.html#saveObject">saveObject</a></li><li><a href="global.html#saveObjectRegistry">saveObjectRegistry</a></li><li><a href="global.html#saveRangedSummarizedExperiment">saveRangedSummarizedExperiment</a></li><li><a href="global.html#saveSingleCellExperiment">saveSingleCellExperiment</a></li><li><a href="global.html#saveSummarizedExperiment">saveSummarizedExperiment</a></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">List.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { List, IntegerList, StringList, BooleanList, NumberList } from "bioconductor";
+import { H5Group, H5DataSet } from "./h5.js";
+import { readObject, readObjectFile, saveObject } from "./general.js";
+import { joinPath } from "./utils.js";
+
+function load_number(x) {
+    if (x === "NaN") {
+        return Number.NaN;
+    } else if (x === "Inf") {
+        return Number.POSITIVE_INFINITY;
+    } else if (x === "-Inf") {
+        return Number.NEGATIVE_INFINITY;
+    } else {
+        return x;
+    }
+}
+
+function load_vector(x, constructor) {
+    let vals = x.values;
+    let scalar = false;
+    if (!(vals instanceof Array)) {
+        vals = [vals];
+        scalar = true;
+    }
+    let output = constructor(vals);
+    if ("names" in x) {
+        output.setNames(x.names, { inPlace: true });
+    }
+    output._jaspalite_scalar = scalar;
+    return output;
+}
+
+async function load_json_list(x, path, globals, options) {
+    if (x.type == "list") {
+        let contents = [];
+        for (const y of x.values) {
+            contents.push(await load_json_list(y, path, globals, options));
+        }
+        let output = new List(contents);
+        if ("names" in x) {
+            output.setNames(x.names, { inPlace: true });
+        }
+        return output;
+
+    } else if (x.type == "integer") {
+        return load_vector(x, v => new IntegerList(v));
+
+    } else if (x.type == "number") {
+        return load_vector(x, v => new NumberList(v.map(load_number)));
+
+    } else if (x.type == "string") {
+        return load_vector(x, v => new StringList(v));
+
+    } else if (x.type == "boolean") {
+        return load_vector(x, v => new BooleanList(v));
+
+    } else if (x.type == "factor") {
+        // Whatever, just turn it into a StringList.
+        return load_vector(x, v => {
+            let copy = v.slice();
+            for (var i = 0; i &lt; copy.length; i++) {
+                if (copy[i] !== null) {
+                    copy[i] = x.levels[copy[i]];
+                }
+            }
+            return new StringList(copy);
+        });
+
+    } else if (x.type == "nothing") {
+        return null;
+
+    } else if (x.type == "external") {
+        return readObject(joinPath(path, "other_contents", String(x.index)), null, globals, options);
+
+    } else {
+        throw new Error("unknown JSON list type '" + x.type + "'");
+    }
+}
+
+/**
+ * An R-style list that allows access by name or index. 
+ * @external List 
+ * @see {@link https://ltla.github.io/bioconductor.js/List.html}
+ */
+
+/**
+ * @param {string} path - Path to the takane-formatted object directory containing the {@link external:List List}.
+ * @param {object} metadata - Takane object metadata, typically generated by calling {@linkcode readObjectFile} on `path`.
+ * @param {object} globals - Object containing `fs`, an object satisfying the {@link GlobalFsInterface}; and `h5`, an object satisfying the {@link GlobalH5Interface}.
+ * @param {object} [options={}] - Further options.
+ *
+ * @return {external:List} The list.
+ * @async
+ */
+export async function readList(path, metadata, globals, options = {}) {
+    if (metadata.simple_list.format !== "json.gz") {
+        throw new Error("list formats other than 'json.gz' are currently not supported");
+    }
+    let contents = await globals.fs.get(joinPath(path, "list_contents.json.gz"), { asBuffer: true });
+
+    const stream = new Blob([contents]).stream();
+    const decompressed_stream = stream.pipeThrough(new DecompressionStream("gzip"));
+    let chunks = [];
+    let counter = 0;
+    for await (const chunk of decompressed_stream) {
+        chunks.push(chunk);
+        counter += chunk.length;
+    }
+    let decompressed_final = new Uint8Array(counter);
+    counter = 0;
+    for (const chunk of chunks) {
+        decompressed_final.set(chunk, counter);
+        counter += chunk.length;
+    }
+
+    let dec = new TextDecoder;
+    let str = dec.decode(decompressed_final);
+    let x = JSON.parse(str);
+    return load_json_list(x, path, globals, options);
+}
+
+function dump_number_array(x) {
+    let output = Array.from(x);
+    for (var i = 0; i &lt; output.length; i++) {
+        let current = output[i];
+        if (Number.isNaN(current)) {
+            output[i] = "NaN";
+        } else if (current == Number.POSITIVE_INFINITY) {
+            output[i] = "Inf";
+        } else if (current == Number.NEGATIVE_INFINITY) {
+            output[i] = "-Inf";
+        }
+    }
+    return output;
+}
+
+function dump_vector(x) {
+    let vals = x.toArray();
+    if (vals.length == 1 &amp;&amp; "_jaspagate_scalar" in x &amp;&amp; x._jaspagate_scalar) {
+        return vals[0];
+    } else {
+        return vals;
+    }
+}
+
+async function dump_json_list(x, path, globals, options, state) {
+    if (x instanceof Array) {
+        let output = { "type": "list", "values": [] };
+
+        if (x.length) {
+            let all_strings = true;
+            let all_bools = true;
+            let all_numbers = true;
+            for (const e of x) {
+                if (e !== null) {
+                    if (typeof e !== "string") {
+                        all_strings = false;
+                    }
+                    if (typeof e !== "boolean") {
+                        all_bools = false;
+                    }
+                    if (typeof e !== "number") {
+                        all_numbers = false;
+                    }
+                }
+            }
+
+            if (all_strings) {
+                output.type = "string";
+                output.values = x;
+            } else if (all_bools) {
+                output.type = "boolean";
+                output.values = x;
+            } else if (all_numbers) {
+                output.type = "number";
+                output.values = dump_number_array(x);
+            } else {
+                for (const e of x) {
+                    output.values.push(await dump_json_list(e, path, globals, options, state));
+                }
+            }
+        }
+
+        return output;
+
+    } else if (x instanceof List) {
+        let output = { "type": "list", "values": [] }
+        if (x instanceof IntegerList) {
+            output.type = "integer";
+            const upper = 2**31, lower = -upper;
+            for (const v of x) {
+                if (v &lt; lower || v >= upper) {
+                    output.type = "number";
+                    break;
+                }
+            }
+            output.values = dump_vector(x);
+        } else if (x instanceof NumberList) {
+            output.type = "number";
+            output.values = dump_vector(x);
+        } else if (x instanceof StringList) {
+            output.type = "string";
+            output.values = dump_vector(x);
+        } else if (x instanceof BooleanList) {
+            output.type = "boolean";
+            output.values = dump_vector(x);
+        } else {
+            for (const v of x) {
+                output.values.push(await dump_json_list(v, path, globals, options, state));
+            }
+        }
+        if (x.names() !== null) {
+            output.names = x.names();
+        }
+        return output;
+
+    } else if (x === null) {
+        return { "type": "nothing" };
+
+    } else if (x.constructor === Object) {
+        let output = { "type": "list", "values": [], "names": [] };
+        for (const [k, v] of Object.entries(x)) {
+            output.names.push(k);
+            output.values.push(dump_json_list(v, path, globals, options, state));
+        }
+        return output;
+
+    } else if (x instanceof Int8Array || x instanceof Int16Array || x instanceof Int32Array || x instanceof Uint8Array || x instanceof Uint16Array) {
+        return { "type": "integer", "values": Array.from(x) }
+
+    } else if (x instanceof Uint32Array || x instanceof BigInt64Array || x instanceof BigUint64Array) {
+        return { "type": "number", "values": Array.from(x).map(y => Number(y)) }
+
+    } else if (x instanceof Float64Array || x instanceof Float32Array) {
+        return { "type": "number", "values": dump_number_array(x) };
+
+    } else if (typeof x == "number") {
+        return { "type": "number", "values": x };
+
+    } else if (typeof x == "string") {
+        return { "type": "string", "values": x };
+
+    } else if (typeof x == "boolean") {
+        return { "type": "boolean", "values": x };
+
+    } else {
+        let odir = joinPath(path, "other_contents");
+        if (!(await globals.fs.exists(odir))) {
+            await globals.fs.mkdir(odir);
+        }
+        let curdex = state.index;
+        await saveObject(x, joinPath(odir, String(curdex)), globals, options);
+        state.index++;
+        return { "type": "external", "index": curdex };
+    }
+}
+
+/**
+ * @param {external:List} x - The list.
+ * @param {string} path - Path to the directory in which to save `x`.
+ * @param {object} globals - Object containing `fs`, an object satisfying the {@link GlobalFsInterface}; and `h5`, an object satisfying the {@link GlobalH5Interface}.
+ * @param {object} [options={}] - Further options.
+ *
+ * @return `x` is stored at `path`.
+ * @async
+ */
+export async function saveList(x, path, globals, options = {}) {
+    await globals.fs.mkdir(path);
+
+    let objmeta = {
+        type: "simple_list",
+        simple_list: {
+            version: "1.1",
+            format: "json.gz"
+        }
+    };
+    await globals.fs.write(joinPath(path, "OBJECT"), JSON.stringify(objmeta));
+
+    let converted = await dump_json_list(x, path, globals, options, { index: 0 });
+    let stringified = JSON.stringify(converted);
+
+    const stream = new Blob([stringified]).stream();
+    const compressed_stream = stream.pipeThrough(new CompressionStream("gzip"));
+    let chunks = [];
+    let counter = 0;
+    for await (const chunk of compressed_stream) {
+        chunks.push(chunk);
+        counter += chunk.length;
+    }
+    let compressed_final = new Uint8Array(counter);
+    counter = 0;
+    for (const chunk of chunks) {
+        compressed_final.set(chunk, counter);
+        counter += chunk.length;
+    }
+
+    await globals.fs.write(joinPath(path, "list_contents.json.gz"), compressed_final);
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.4</a> on Fri Jul 25 2025 02:32:34 GMT+0000 (Coordinated Universal Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
+</body>
+</html>
