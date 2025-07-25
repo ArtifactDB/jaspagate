@@ -28,26 +28,28 @@ export class TestDenseMatrix {
 
 jsp.readObjectRegistry["dense_array"] = async function(path, metadata, globals, options) {
     let contents = await globals.fs.get(path + "/array.h5");
-    const handle_stack = [];
-
-    const fhandle = await globals.h5.open(contents, { readOnly: true });
-    handle_stack.push(fhandle);
     try {
-        let ghandle = fhandle.open("dense_array");
-        handle_stack.push(ghandle);
-        let dhandle = ghandle.open("data");
-        handle_stack.push(dhandle);
+        const fhandle = await globals.h5.open(contents, { readOnly: true });
+        const handle_stack = [fhandle];
+        try {
+            let ghandle = fhandle.open("dense_array");
+            handle_stack.push(ghandle);
+            let dhandle = ghandle.open("data");
+            handle_stack.push(dhandle);
 
-        let shape = dhandle.shape();
-        if (ghandle.attributes().indexOf("transposed") >= 0 && ghandle.readAttribute("transposed").values[0] != 0) {
-            return new TestDenseMatrix(shape[1], shape[0]);
-        } else {
-            return new TestDenseMatrix(shape[0], shape[1]);
+            let shape = dhandle.shape();
+            if (ghandle.attributes().indexOf("transposed") >= 0 && ghandle.readAttribute("transposed").values[0] != 0) {
+                return new TestDenseMatrix(shape[1], shape[0]);
+            } else {
+                return new TestDenseMatrix(shape[0], shape[1]);
+            }
+        } finally {
+            for (const handle of handle_stack.reverse()) {
+                handle.close();
+            }
+            globals.h5.close(fhandle);
         }
     } finally {
-        for (const handle of handle_stack.reverse()) {
-            handle.close();
-        }
         globals.fs.clean(contents);
     }
 };
@@ -59,9 +61,10 @@ jsp.saveObjectRegistry.push(
             await globals.fs.mkdir(path); 
             await globals.fs.write(path + "/OBJECT", JSON.stringify({ "type": "dense_array", "dense_array": { "version": "1.0" } }));
 
-            const handle_stack = [];
-            const fhandle = await globals.h5.open(path + "/array.h5", { readOnly: false });
-            handle_stack.push(fhandle);
+            const h5path = path + "/array.h5";
+            const fhandle = await globals.h5.create(h5path);
+            let handle_stack = [fhandle];
+            let success = false;
             try {
                 let ghandle = fhandle.createGroup("dense_array");
                 handle_stack.push(ghandle);
@@ -73,9 +76,14 @@ jsp.saveObjectRegistry.push(
                     { data: new Int32Array(x.numberOfRows() * x.numberOfColumns()) }
                 );
                 handle_stack.push(dhandle);
+                success = true;
             } finally {
                 for (const handle of handle_stack.reverse()) {
                     handle.close();
+                }
+                let payload = await globals.h5.finalize(fhandle, !success);
+                if (payload !== null) {
+                    await globals.fs.write(h5path, payload);
                 }
             }
         }
