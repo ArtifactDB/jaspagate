@@ -23,6 +23,15 @@ test("readList with different types", async () => {
     expect(list.get(4).toArray()).toEqual([true,false,true,false,true,false,true,false,true,false]);
 
     expect(list.get(5)).toBeNull();
+
+    // Reporting TypedArray outputs instead.
+    list = await jsp.readObject("artifacts/List-all_types", null, test_globals, { List_toTypedArray: true });
+    expect(list.get(0) instanceof Int32Array).toBe(true);
+    expect(list.get(1) instanceof Float64Array).toBe(true);
+    expect(list.get(2) instanceof bioc.StringList).toBe(true);
+    expect(list.get(3) instanceof bioc.StringList).toBe(true);
+    expect(list.get(4) instanceof bioc.BooleanList).toBe(true);
+    expect(list.get(5)).toBeNull();
 })
 
 test("readList with names", async () => {
@@ -53,6 +62,13 @@ test("readList with scalars", async () => {
 
     expect(list.get(3) instanceof bioc.BooleanList).toBe(true);
     expect(list.get(3).toArray()).toEqual([true]);
+
+    // Reporting scalar outputs instead.
+    list = await jsp.readObject("artifacts/List-scalars", null, test_globals, { List_toScalar: true });
+    expect(list.get(0)).toEqual(1);
+    expect(list.get(1)).toEqual(1.5);
+    expect(list.get(2)).toEqual("foo_bar");
+    expect(list.get(3)).toEqual(true);
 })
 
 test("readList with specials", async () => {
