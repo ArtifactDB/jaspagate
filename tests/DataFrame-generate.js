@@ -23,7 +23,12 @@ let all_types = new bioc.DataFrame(
         "f64": new Float64Array([1,2,3,4,5,6,7,8,9,10]),
         "number": [0.5,1,1.5,2,2.5,3,3.5,4,4.5,5],
         "string": ["foo_a","foo_b","foo_c","foo_d","foo_e","foo_f","foo_g","foo_h","foo_i","foo_j"],
-        "boolean": [true,false,true,false,true,false,true,false,true,false]
+        "boolean": [true,false,true,false,true,false,true,false,true,false],
+        "integer_list": new bioc.IntegerList([1,2,3,4,5,6,7,8,9,10]),
+        "integer_list2": new bioc.IntegerList([1,2,3,4,5,6,7,8,9,2**31]),
+        "number_list": new bioc.NumberList([0.5,1,1.5,2,2.5,3,3.5,4,4.5,5]),
+        "string_list": new bioc.StringList(["foo_a","foo_b","foo_c","foo_d","foo_e","foo_f","foo_g","foo_h","foo_i","foo_j"]),
+        "boolean_list": new bioc.BooleanList([true,false,true,false,true,false,true,false,true,false])
     },
     {
         rowNames: ["sample_1","sample_2","sample_3","sample_4","sample_5","sample_6","sample_7","sample_8","sample_9","sample_10"]
@@ -45,7 +50,11 @@ let missingness = new bioc.DataFrame(
         "number_with_every_special": [Number.POSITIVE_INFINITY,null,Number.NaN,0,Number.NEGATIVE_INFINITY,Number.MAX_VALUE,-Number.MAX_VALUE,4,4.5,5],
         "string": ["foo_a","foo_b","foo_c",null,"foo_e","foo_f","foo_g","foo_h","foo_i","foo_j"],
         "string_with_na": ["foo_a","foo_b","NA",null,"foo_e","foo_f","foo_g","foo_h","foo_i","foo_j"],
-        "boolean": [true,false,true,false,null,false,true,false,true,false]
+        "boolean": [true,false,true,false,null,false,true,false,true,false],
+        "integer_list": new bioc.IntegerList([1,null,3,4,5,6,7,8,9,10]),
+        "number_list": new bioc.NumberList([0.5,null,1.5,2,2.5,3,3.5,4,4.5,5]),
+        "string_list": new bioc.StringList(["foo_a","foo_b","foo_c",null,"foo_e","foo_f","foo_g","foo_h","foo_i","foo_j"]),
+        "boolean_list": new bioc.BooleanList([true,false,true,false,null,false,true,false,true,false])
     }
 );
 
@@ -65,7 +74,9 @@ let nested = new bioc.DataFrame(
                 "bar": ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]
             }
         ),
-        "Y": ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
+        "Y": ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
+        "Z": new bioc.List([1,2,"C","D",true,false,null,null,null,null]),
+        "AA": [1,2,"C","D",true,false,null,null,null,null]
     }
 );
 

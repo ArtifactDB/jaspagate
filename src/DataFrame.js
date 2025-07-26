@@ -1,7 +1,7 @@
-import { DataFrame, List } from "bioconductor";
+import { DataFrame, List, IntegerList, NumberList, BooleanList, StringList } from "bioconductor";
 import { H5Group, H5DataSet } from "./h5.js";
 import { readObject, readObjectFile, saveObject } from "./general.js";
-import { joinPath } from "./utils.js";
+import { joinPath, formatNumberArrayForHdf5, formatIntegerArrayForHdf5, formatStringArrayForHdf5, formatBooleanArrayForHdf5 } from "./utils.js";
 import { readAnnotatedMetadata, saveAnnotatedMetadata } from "./metadata.js";
 
 /**
@@ -22,6 +22,8 @@ import { readAnnotatedMetadata, saveAnnotatedMetadata } from "./metadata.js";
  * @param {function|boolean} [options.DataFrame_readMetadata=true] - How to read the metadata.
  * If `true`, {@linkcode readObject} is used, while if `false`, metadata will be skipped.
  * If a function is provided, it should accept `path`, `metadata`, `globals` and `options` (as described above), and return a {@link external:List List}.
+ * @param {boolean} [options.List_toTypedArray=false] - Whether to report integer/number vectors without missing values as TypedArrays.
+ * If `false`, vectors are reported as instances of an appropriately-typed {@link List} subclass.
  *
  * @return {external:DataFrame} The data frame.
  * @async
@@ -31,6 +33,10 @@ export async function readDataFrame(path, metadata, globals, options = {}) {
     if ("DataFrame_readNested" in options) {
         read_nested = options.DataFrame_readNested;
     } 
+    let typedarray = true;
+    if ("DataFrame_toTypedArray" in options) {
+        typedarray = options.DataFrame_toTypedArray;
+    }
 
     let handle_stack = [];
     let contents = await globals.fs.get(joinPath(path, "basic_columns.h5"));
@@ -86,7 +92,7 @@ export async function readDataFrame(path, metadata, globals, options = {}) {
                 }
 
                 if (type == "number") {
-                    if (has_missing) {
+                    if (has_missing || !typedarray) {
                         vals = Array.from(rawvals)
                         if (Number.isNaN(missing_attr)) {
                             for (let i = 0; i < vals.length; i++) {
@@ -101,6 +107,7 @@ export async function readDataFrame(path, metadata, globals, options = {}) {
                                 }
                             }
                         }
+                        vals = new NumberList(vals);
                     } else {
                         vals = new Float64Array(rawvals); // force it to be floating-point.
                     }
@@ -120,17 +127,19 @@ export async function readDataFrame(path, metadata, globals, options = {}) {
                             vals[i] = (rawvals[i] != 0);
                         }
                     }
+                    vals = new BooleanList(vals);
 
                 } else if (type == "integer") {
-                    if (has_missing) {
+                    if (has_missing || !typedarray) {
                         vals = Array.from(rawvals);
                         for (let i = 0; i < vals.length; i++) {
                             if (vals[i] == missing_attr) {
                                 vals[i] = null;
                             }
                         }
+                        vals = new IntegerList(vals);
                     } else {
-                        vals = rawvals.slice(); // make a copy, to be safe.
+                        vals = new Int32Array(rawvals);
                     }
 
                 } else if (type == "string") {
@@ -142,6 +151,7 @@ export async function readDataFrame(path, metadata, globals, options = {}) {
                             }
                         }
                     }
+                    vals = new StringList(vals);
 
                 } else {
                     throw new Error("unknown type '" + type + "' in column '" + k + "' of a DataFrame at '" + path + "'");
@@ -182,7 +192,7 @@ export async function readDataFrame(path, metadata, globals, options = {}) {
                         }
                     }
 
-                    collected[k] = vals;
+                    collected[k] = new StringList(vals);
                     cohandle.close();
                     handle_stack.pop();
 
@@ -219,7 +229,7 @@ export async function readDataFrame(path, metadata, globals, options = {}) {
                         }
                     }
 
-                    collected[k] = vals;
+                    collected[k] = new StringList(vals);
                     phandle.close();
                     handle_stack.pop();
 
@@ -379,6 +389,59 @@ export async function saveDataFrame(x, path, globals, options = {}) {
                 chandle.close();
                 handle_stack.pop();
 
+            } else if (col instanceof IntegerList) {
+                let formatted = formatIntegerArrayForHdf5(col.toArray());
+                let dtype;
+                let htype;
+                if (formatted.integer) {
+                    dtype = "integer";
+                    htype = "Int32";
+                } else {
+                    dtype = "number";
+                    htype = "Float64";
+                }
+                let chandle = dhandle.createDataSet(iname, htype, [ formatted.data.length ], { data: formatted.data });
+                handle_stack.push(chandle);
+                chandle.writeAttribute("type", "String", [], [dtype]);
+                if (formatted.placeholder !== null) {
+                    chandle.writeAttribute("missing-value-placeholder", htype, [], [formatted.placeholder]);
+                }
+                chandle.close();
+                handle_stack.pop();
+
+            } else if (col instanceof NumberList) {
+                let formatted = formatNumberArrayForHdf5(col.toArray());
+                let chandle = dhandle.createDataSet(iname, "Float64", [ formatted.data.length ], { data: formatted.data });
+                handle_stack.push(chandle);
+                chandle.writeAttribute("type", "String", [], ["number"]);
+                if (formatted.placeholder !== null) {
+                    chandle.writeAttribute("missing-value-placeholder", "Float64", [], [formatted.placeholder]);
+                }
+                chandle.close();
+                handle_stack.pop();
+
+            } else if (col instanceof StringList) {
+                let formatted = formatStringArrayForHdf5(col.toArray());
+                let chandle = dhandle.createDataSet(iname, "String", [ formatted.data.length ], { data: formatted.data });
+                handle_stack.push(chandle);
+                chandle.writeAttribute("type", "String", [], ["string"]);
+                if (formatted.placeholder !== null) {
+                    chandle.writeAttribute("missing-value-placeholder", "String", [], [formatted.placeholder]);
+                }
+                chandle.close();
+                handle_stack.pop();
+
+            } else if (col instanceof BooleanList) {
+                let formatted = formatBooleanArrayForHdf5(col.toArray());
+                let chandle = dhandle.createDataSet(iname, "Int8", [ formatted.data.length ], { data: formatted.data });
+                handle_stack.push(chandle);
+                chandle.writeAttribute("type", "String", [], ["boolean"]);
+                if (formatted.placeholder !== null) {
+                    chandle.writeAttribute("missing-value-placeholder", "Int8", [], [formatted.placeholder]);
+                }
+                chandle.close();
+                handle_stack.pop();
+
             } else if (col instanceof Array) {
                 // Try to guess the type of everything.
                 let types = new Set;
@@ -403,93 +466,36 @@ export async function saveDataFrame(x, path, globals, options = {}) {
                 } else if (types.size == 1) {
                     // Javascript doesn't have native integers, so we'll save it all as 'number'.
                     if (types.has("number")) {
-                        let placeholder = null;
-                        if (has_missing) {
-                            col = col.slice();
-                            if (!col.some(Number.isNaN)) {
-                                placeholder = Number.NaN;
-                            } else {
-                                for (const candidate of [0, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.MAX_VALUE, -Number.MAX_VALUE, 0 ]) {
-                                    if (col.indexOf(candidate) < 0) {
-                                        placeholder = candidate;
-                                        break;
-                                    }
-                                }
-                            }
-
-                            if (placeholder === null) {
-                                let sorted = Array.from(new Set(col)).sort((a, b) => a - b);
-                                let last = -Number.MAX_VALUE;
-                                for (const x of sorted) {
-                                    if (Number.isFinite(x)) {
-                                        let candidate = last + (x - last) / 2;
-                                        if (candidate != last && candidate != x) {
-                                            placeholder = candidate;
-                                            break;
-                                        }
-                                        last = x;
-                                    }
-                                }
-                            }
-
-                            for (const [i, v] of Object.entries(col)) {
-                                if (v == null) {
-                                    col[i] = placeholder;
-                                }
-                            }
-                        }
-
-                        let chandle = dhandle.createDataSet(iname, "Float64", [ col.length ], { data: col });
+                        let formatted = formatNumberArrayForHdf5(col);
+                        let chandle = dhandle.createDataSet(iname, "Float64", [ col.length ], { data: formatted.data });
                         handle_stack.push(chandle);
                         chandle.writeAttribute("type", "String", [], ["number"]);
-                        if (has_missing) {
-                            chandle.writeAttribute("missing-value-placeholder", "Float64", [], [ placeholder ]);
+                        if (formatted.placeholder !== null) {
+                            chandle.writeAttribute("missing-value-placeholder", "Float64", [], [ formatted.placeholder ]);
                         }
                         chandle.close();
                         handle_stack.pop();
                         okay = true;
 
                     } else if (types.has("boolean")) {
-                        let vals = new Uint8Array(col.length);
-                        for (let i = 0; i < col.length; i++) {
-                            if (col[i] == null) {
-                                vals[i] = 2;
-                            } else {
-                                vals[i] = col[i];
-                            }
-                        }
-
-                        let chandle = dhandle.createDataSet(iname, "Uint8", [ col.length ], { data: vals });
+                        let formatted = formatBooleanArrayForHdf5(col);
+                        let chandle = dhandle.createDataSet(iname, "Uint8", [ col.length ], { data: formatted.data });
                         handle_stack.push(chandle);
                         chandle.writeAttribute("type", "String", [], ["boolean"]);
-                        if (has_missing) {
-                            chandle.writeAttribute("missing-value-placeholder", "Uint8", [], [ 2 ]);
+                        if (formatted.placeholder !== null) {
+                            chandle.writeAttribute("missing-value-placeholder", "Uint8", [], [ formatted.placeholder ]);
                         }
                         chandle.close();
                         handle_stack.pop();
                         okay = true;
 
                     } else if (types.has("string")) {
-                        let placeholder;
-                        if (has_missing) {
-                            col = col.slice();
-                            placeholder = "NA";
-                            while (col.indexOf(placeholder) >= 0) {
-                                placeholder += "_";
-                            }
-                            for (const [i, v] of Object.entries(col)) {
-                                if (v === null) {
-                                    col[i] = placeholder;
-                                }
-                            }
-                        }
-
-                        // Not saving as VLS for simplicity.
-                        let chandle = dhandle.createDataSet(iname, "String", [ col.length ], { data: col });
+                        let formatted = formatStringArrayForHdf5(col);
+                        let chandle = dhandle.createDataSet(iname, "String", [ col.length ], { data: formatted.data });
                         handle_stack.push(chandle);
                         chandle.writeAttribute("type", "String", [], ["string"]);
                         if (has_missing) {
-                            chandle.writeAttribute("missing-value-placeholder", "String", [], [ placeholder ]);
+                            chandle.writeAttribute("missing-value-placeholder", "String", [], [ formatted.placeholder ]);
                         }
                         chandle.close();
                         handle_stack.pop();
@@ -498,7 +504,7 @@ export async function saveDataFrame(x, path, globals, options = {}) {
                 }
 
                 if (!okay) {
-                    externals[iname] = col;
+                    externals[iname] = new List(col);
                 }
 
             } else {

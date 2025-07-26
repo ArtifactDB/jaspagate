@@ -1,7 +1,7 @@
 import { List, IntegerList, StringList, BooleanList, NumberList } from "bioconductor";
 import { H5Group, H5DataSet } from "./h5.js";
 import { readObject, readObjectFile, saveObject } from "./general.js";
-import { joinPath } from "./utils.js";
+import { joinPath, exceedsInt32 } from "./utils.js";
 
 function load_number(x) {
     if (x === "NaN") {
@@ -206,14 +206,7 @@ async function dump_json_list(x, path, globals, options, state) {
     } else if (x instanceof List) {
         let output = { "type": "list", "values": [] }
         if (x instanceof IntegerList) {
-            output.type = "integer";
-            const upper = 2**31, lower = -upper;
-            for (const v of x) {
-                if (v < lower || v >= upper) {
-                    output.type = "number";
-                    break;
-                }
-            }
+            output.type = (exceedsInt32(x) ? "number" : "integer");
             output.values = dump_vector(x);
         } else if (x instanceof NumberList) {
             output.type = "number";

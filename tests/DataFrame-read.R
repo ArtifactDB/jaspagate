@@ -19,6 +19,11 @@ test_that("saveDataFrame works with all types", {
     expect_identical(df$number, (1:10)/2)
     expect_identical(df$string, paste0("foo_", letters[1:10]))
     expect_identical(df$boolean, rep(c(TRUE, FALSE), 5))
+    expect_identical(df$integer_list, 1:10)
+    expect_identical(df$integer_list2, c(1:9, 2^31))
+    expect_identical(df$number_list, (1:10)/2)
+    expect_identical(df$string_list, paste0("foo_", letters[1:10]))
+    expect_identical(df$boolean_list, rep(c(TRUE, FALSE), 5))
     expect_identical(rownames(df), paste0("sample_", 1:10))
 })
 
@@ -32,6 +37,10 @@ test_that("saveDataFrame works with missing values", {
     expect_identical(df$string, c("foo_a","foo_b","foo_c",NA,"foo_e","foo_f","foo_g","foo_h","foo_i","foo_j"))
     expect_identical(df$string_with_na, c("foo_a","foo_b","NA",NA,"foo_e","foo_f","foo_g","foo_h","foo_i","foo_j"))
     expect_identical(df$boolean, c(TRUE,FALSE,TRUE,FALSE,NA,FALSE,TRUE,FALSE,TRUE,FALSE))
+    expect_identical(df$integer_list, c(1L,NA,3L,4L,5L,6L,7L,8L,9L,10L))
+    expect_identical(df$number_list, c(0.5,NA,1.5,2,2.5,3,3.5,4,4.5,5))
+    expect_identical(df$string_list, c("foo_a","foo_b","foo_c",NA,"foo_e","foo_f","foo_g","foo_h","foo_i","foo_j"))
+    expect_identical(df$boolean_list, c(TRUE,FALSE,TRUE,FALSE,NA,FALSE,TRUE,FALSE,TRUE,FALSE))
     expect_null(rownames(df))
 })
 
@@ -43,6 +52,8 @@ test_that("saveDataFrame works with nested objects", {
     expect_identical(df$X$foo, 1:10)
     expect_identical(df$X$bar, letters[1:10])
     expect_identical(df$Y, LETTERS[1:10])
+    expect_identical(df$Z, list(1,2,"C","D",TRUE,FALSE,NULL,NULL,NULL,NULL))
+    expect_identical(df$AA, list(1,2,"C","D",TRUE,FALSE,NULL,NULL,NULL,NULL))
 })
 
 test_that("saveDataFrame works with metadata", {
