@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>H5Group - Documentation</title>
+    <title>GlobalsInterface - Documentation</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -37,7 +37,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">H5Group</h1>
+    <h1 class="page-title">GlobalsInterface</h1>
     
 
     
@@ -51,12 +51,12 @@
     
         <h2>
         
-            H5Group
+            GlobalsInterface
         
         </h2>
         
-            <div class="class-description usertext"><p>Representation of a group inside a HDF5 file.
-This is an abstract interface that should not be created directly.</p></div>
+            <div class="class-description usertext"><p>Interface for methods to interact with the filesystem and HDF5 files.
+Applications are expected to implement each of the documented methods.</p></div>
         
     
 </header>
@@ -77,88 +77,6 @@ This is an abstract interface that should not be created directly.</p></div>
     
 
     
-        <h3 class="subsection-title">Members</h3>
-
-        
-            
-<h4 class="name" id="attributes"><span class="type-signature"></span>attributes<span class="type-signature"> :Array</span></h4>
-
-
-
-
-
-<dl class="details">
-    
-    <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>Array containing the names of all attributes of this object.</p></li></ul></dd>
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="h5.js.html">h5.js</a>, <a href="h5.js.html#line11">line 11</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description usertext">
-    <p>Array containing the names of all attributes of this object.</p>
-</div>
-
-
-
-    <h5 class="h5-types">Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">Array</span>
-
-
-
-        </li>
-    </ul>
-
-
-
-
-
-
-        
-    
 
     
         <h3 class="subsection-title">Methods</h3>
@@ -168,7 +86,7 @@ This is an abstract interface that should not be created directly.</p></div>
 
     
 
-    <h4 class="name" id="children"><span class="type-signature"></span>children<span class="signature">()</span><span class="type-signature"> &rarr; {Array}</span></h4>
+    <h4 class="name" id="clean"><span class="type-signature"></span>clean<span class="signature">(x)</span><span class="type-signature"> &rarr; {undefined|Promise.&lt;undefined>}</span></h4>
 
     
 
@@ -181,7 +99,7 @@ This is an abstract interface that should not be created directly.</p></div>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="h5.js.html">h5.js</a>, <a href="h5.js.html#line47">line 47</a>
+        <a href="globals.js.html">globals.js</a>, <a href="globals.js.html#line55">line 55</a>
     </li></ul></dd>
     
 
@@ -226,6 +144,56 @@ This is an abstract interface that should not be created directly.</p></div>
 
 
 
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>x</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Return value of <a href="GlobalsInterface.html#get"><code>get</code></a>.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -246,7 +214,9 @@ This is an abstract interface that should not be created directly.</p></div>
 
         
 <div class="param-desc">
-    <p>Names of the children of this group.</p>
+    <p>Any resources used by <a href="GlobalsInterface.html#get"><code>get</code></a> to return <code>x</code> can be freed.
+For example, if <code>x</code> is a path referring to a temporary file, it can be removed.
+No value is returned, though the method may be asynchronous.</p>
 </div>
 
 
@@ -257,7 +227,10 @@ This is an abstract interface that should not be created directly.</p></div>
     </dt>
     <dd>
         
-<span class="param-type">Array</span>
+<span class="param-type">undefined</span>
+|
+
+<span class="param-type">Promise.&lt;undefined></span>
 
 
 
@@ -273,7 +246,7 @@ This is an abstract interface that should not be created directly.</p></div>
 
     
 
-    <h4 class="name" id="close"><span class="type-signature"></span>close<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="exists"><span class="type-signature"></span>exists<span class="signature">(path)</span><span class="type-signature"> &rarr; {boolean|Promise.&lt;boolean>}</span></h4>
 
     
 
@@ -286,7 +259,7 @@ This is an abstract interface that should not be created directly.</p></div>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="h5.js.html">h5.js</a>, <a href="h5.js.html#line95">line 95</a>
+        <a href="globals.js.html">globals.js</a>, <a href="globals.js.html#line31">line 31</a>
     </li></ul></dd>
     
 
@@ -333,6 +306,56 @@ This is an abstract interface that should not be created directly.</p></div>
 
 
 
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>path</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Path to the file, see <a href="GlobalsInterface.html#get"><code>get</code></a> for details.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
 
 
 
@@ -351,11 +374,26 @@ This is an abstract interface that should not be created directly.</p></div>
 
         
 <div class="param-desc">
-    <p>Closes the group handle.
-Any subsequent method invocations on this group or its children are considered invalid.</p>
+    <p>Whether the <code>path</code> exists.</p>
 </div>
 
 
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+|
+
+<span class="param-type">Promise.&lt;boolean></span>
+
+
+
+    </dd>
+</dl>
 
     
 
@@ -366,7 +404,7 @@ Any subsequent method invocations on this group or its children are considered i
 
     
 
-    <h4 class="name" id="createDataSet"><span class="type-signature"></span>createDataSet<span class="signature">(name, type, shape, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="H5DataSet.html">H5DataSet</a>}</span></h4>
+    <h4 class="name" id="get"><span class="type-signature"></span>get<span class="signature">(path, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Uint8Array|string|Promise.&lt;(Uint8Array|string)>}</span></h4>
 
     
 
@@ -379,7 +417,7 @@ Any subsequent method invocations on this group or its children are considered i
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="h5.js.html">h5.js</a>, <a href="h5.js.html#line87">line 87</a>
+        <a href="globals.js.html">globals.js</a>, <a href="globals.js.html#line23">line 23</a>
     </li></ul></dd>
     
 
@@ -455,7 +493,7 @@ Any subsequent method invocations on this group or its children are considered i
 
         <tr>
             
-                <td class="name"><code>name</code></td>
+                <td class="name"><code>path</code></td>
             
 
             <td class="type">
@@ -484,84 +522,9 @@ Any subsequent method invocations on this group or its children are considered i
                 </td>
             
 
-            <td class="description last"><p>Name of the dataset to create.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>type</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-|
-
-<span class="param-type">object</span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Type of dataset to create.
-This can be <code>&quot;IntX&quot;</code> or <code>&quot;UintX&quot;</code> for <code>X</code> of 8, 16, 32, or 64; or <code>&quot;FloatX&quot;</code> for <code>X</code> of 32 or 64; or <code>&quot;String&quot;</code>.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>shape</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array</span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Array containing the dimensions of the dataset to create.
-This can be set to an empty array to create a scalar dataset.</p></td>
+            <td class="description last"><p>Path to the file.
+This may be relative or absolute, depending on the application.
+The path may refer to a file not on the local filesystem, e.g., on a remote server, inside an archive file.</p></td>
         </tr>
 
     
@@ -601,7 +564,7 @@ This can be set to an empty array to create a scalar dataset.</p></td>
                 </td>
             
 
-            <td class="description last"><p>Optional parameters.</p>
+            <td class="description last"><p>Further options.</p>
                 <h6>Properties</h6>
                 
 
@@ -631,13 +594,13 @@ This can be set to an empty array to create a scalar dataset.</p></td>
 
         <tr>
             
-                <td class="name"><code>maxStringLength</code></td>
+                <td class="name"><code>asBuffer</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">boolean</span>
 
 
 
@@ -659,61 +622,12 @@ This can be set to an empty array to create a scalar dataset.</p></td>
             
                 <td class="default">
                 
-                    <code>null</code>
+                    <code>false</code>
                 
                 </td>
             
 
-            <td class="description last"><p>Maximum length of the strings to be saved.
-Only used when <code>type = &quot;String&quot;</code>.
-If <code>null</code>, this should be inferred from the maximum length of strings in <code>options.data</code>.
-If <code>options.data</code> is <code>null</code>, this must be provided for <code>type = &quot;String&quot;</code>.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>data</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array</span>
-|
-
-<span class="param-type">TypedArray</span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                    &lt;nullable><br>
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    <code>null</code>
-                
-                </td>
-            
-
-            <td class="description last"><p>Array to be written to the dataset.
-This is equivalent to calling <a href="H5DataSet.html#write"><code>H5DataSet.write</code></a> immediately after the dataset is created.</p></td>
+            <td class="description last"><p>Whether to return the file contents as a Uint8Array.</p></td>
         </tr>
 
     
@@ -746,8 +660,11 @@ This is equivalent to calling <a href="H5DataSet.html#write"><code>H5DataSet.wri
 
         
 <div class="param-desc">
-    <p>A dataset of the specified type and shape is created as an immediate child of the current group.
-A <a href="H5DataSet.html">H5DataSet</a> object is returned representing this new dataset.</p>
+    <p>Relative or absolute path to the file on the local filesystem.
+Callers should pass this path to <a href="GlobalsInterface.html#clean"><code>clean</code></a> once the file is no longer required.</p>
+<p>If <code>asBuffer = true</code> or if no local filesystem is available, a Uint8Array of the file contents is returned instead.
+This does not need to be passed to <code>clean</code>.</p>
+<p>A promise of a string or Uint8Array may also be returned.</p>
 </div>
 
 
@@ -758,7 +675,13 @@ A <a href="H5DataSet.html">H5DataSet</a> object is returned representing this ne
     </dt>
     <dd>
         
-<span class="param-type"><a href="H5DataSet.html">H5DataSet</a></span>
+<span class="param-type">Uint8Array</span>
+|
+
+<span class="param-type">string</span>
+|
+
+<span class="param-type">Promise.&lt;(Uint8Array|string)></span>
 
 
 
@@ -774,7 +697,7 @@ A <a href="H5DataSet.html">H5DataSet</a> object is returned representing this ne
 
     
 
-    <h4 class="name" id="createGroup"><span class="type-signature"></span>createGroup<span class="signature">(name)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="h5close"><span class="type-signature"></span>h5close<span class="signature">(handle)</span><span class="type-signature"> &rarr; {undefined|Promise.&lt;undefined>}</span></h4>
 
     
 
@@ -787,7 +710,7 @@ A <a href="H5DataSet.html">H5DataSet</a> object is returned representing this ne
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="h5.js.html">h5.js</a>, <a href="h5.js.html#line66">line 66</a>
+        <a href="globals.js.html">globals.js</a>, <a href="globals.js.html#line89">line 89</a>
     </li></ul></dd>
     
 
@@ -859,13 +782,13 @@ A <a href="H5DataSet.html">H5DataSet</a> object is returned representing this ne
 
         <tr>
             
-                <td class="name"><code>name</code></td>
+                <td class="name"><code>handle</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type"><a href="H5Group.html">H5Group</a></span>
 
 
 
@@ -876,7 +799,8 @@ A <a href="H5DataSet.html">H5DataSet</a> object is returned representing this ne
 
             
 
-            <td class="description last"><p>Name of the group to create.</p></td>
+            <td class="description last"><p>Return value of <a href="GlobalsInterface.html#h5open"><code>h5open</code></a>.
+This will already have its <a href="H5Group.html#close"><code>close</code></a> method invoked.</p></td>
         </tr>
 
     
@@ -902,13 +826,28 @@ A <a href="H5DataSet.html">H5DataSet</a> object is returned representing this ne
 
         
 <div class="param-desc">
-    <p>{@H5Group} A group is created as an immediate child of the current group.
-A <a href="H5Group.html">H5Group</a> object is returned representing this new group.
-If a group already exists at <code>name</code>, it is returned directly.</p>
+    <p>This should execute clean-up operations when the file used in <code>h5open</code> is no longer needed.
+No value is returned, possibly asynchronously.</p>
 </div>
 
 
 
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">undefined</span>
+|
+
+<span class="param-type">Promise.&lt;undefined></span>
+
+
+
+    </dd>
+</dl>
+
     
 
 
@@ -918,7 +857,7 @@ If a group already exists at <code>name</code>, it is returned directly.</p>
 
     
 
-    <h4 class="name" id="open"><span class="type-signature"></span>open<span class="signature">(name)</span><span class="type-signature"> &rarr; {<a href="H5Group.html">H5Group</a>|<a href="H5DataSet.html">H5DataSet</a>}</span></h4>
+    <h4 class="name" id="h5create"><span class="type-signature"></span>h5create<span class="signature">(path)</span><span class="type-signature"> &rarr; {<a href="H5Group.html">H5Group</a>|Promise.&lt;<a href="H5Group.html">H5Group</a>>}</span></h4>
 
     
 
@@ -931,7 +870,7 @@ If a group already exists at <code>name</code>, it is returned directly.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="h5.js.html">h5.js</a>, <a href="h5.js.html#line55">line 55</a>
+        <a href="globals.js.html">globals.js</a>, <a href="globals.js.html#line101">line 101</a>
     </li></ul></dd>
     
 
@@ -1003,7 +942,7 @@ If a group already exists at <code>name</code>, it is returned directly.</p>
 
         <tr>
             
-                <td class="name"><code>name</code></td>
+                <td class="name"><code>path</code></td>
             
 
             <td class="type">
@@ -1020,7 +959,9 @@ If a group already exists at <code>name</code>, it is returned directly.</p>
 
             
 
-            <td class="description last"><p>Name of the child element to open.</p></td>
+            <td class="description last"><p>Path to a HDF5 file to be created.
+This may be relative or absolute, depending on the application.
+The path may refer to a location not on the local filesystem, e.g., on a remote server, inside an archive file.</p></td>
         </tr>
 
     
@@ -1046,7 +987,8 @@ If a group already exists at <code>name</code>, it is returned directly.</p>
 
         
 <div class="param-desc">
-    <p>Object representing the child element.</p>
+    <p>A read-write handle to a new HDF5 file, or a promise thereof.
+This may refer to, e.g.,  a temporary file in a virtual filesystem, if no local filesystem exists.</p>
 </div>
 
 
@@ -1060,7 +1002,7 @@ If a group already exists at <code>name</code>, it is returned directly.</p>
 <span class="param-type"><a href="H5Group.html">H5Group</a></span>
 |
 
-<span class="param-type"><a href="H5DataSet.html">H5DataSet</a></span>
+<span class="param-type">Promise.&lt;<a href="H5Group.html">H5Group</a>></span>
 
 
 
@@ -1076,7 +1018,7 @@ If a group already exists at <code>name</code>, it is returned directly.</p>
 
     
 
-    <h4 class="name" id="readAttribute"><span class="type-signature"></span>readAttribute<span class="signature">(attr)</span><span class="type-signature"> &rarr; {object}</span></h4>
+    <h4 class="name" id="h5finish"><span class="type-signature"></span>h5finish<span class="signature">(handle, failed)</span><span class="type-signature"> &rarr; {Uint8Array|Promise.&lt;?Uint8Array>}</span></h4>
 
     
 
@@ -1089,7 +1031,7 @@ If a group already exists at <code>name</code>, it is returned directly.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="h5.js.html">h5.js</a>, <a href="h5.js.html#line23">line 23</a>
+        <a href="globals.js.html">globals.js</a>, <a href="globals.js.html#line113">line 113</a>
     </li></ul></dd>
     
 
@@ -1161,13 +1103,13 @@ If a group already exists at <code>name</code>, it is returned directly.</p>
 
         <tr>
             
-                <td class="name"><code>attr</code></td>
+                <td class="name"><code>handle</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type"><a href="H5Group.html">H5Group</a></span>
 
 
 
@@ -1178,7 +1120,32 @@ If a group already exists at <code>name</code>, it is returned directly.</p>
 
             
 
-            <td class="description last"><p>Name of the attribute.</p></td>
+            <td class="description last"><p>Return value of <a href="GlobalsInterface.html#h5create"><code>h5create</code></a>.
+This will already have its <a href="H5Group.html#close"><code>close</code></a> method invoked.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>failed</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Whether an error occurred when writing to the HDF5 file.</p></td>
         </tr>
 
     
@@ -1204,13 +1171,8 @@ If a group already exists at <code>name</code>, it is returned directly.</p>
 
         
 <div class="param-desc">
-    <p>Object containing:</p>
-<ul>
-<li><code>values</code>, an Array or TypedArray containing the attribute data.
-This should have length equal to the product of <code>shape</code> for non-scalar attributes.</li>
-<li><code>shape</code>, an Array containing the dimensions of the attribute.
-This is empty for scalar attributes, in which case <code>values</code> will have length 1.</li>
-</ul>
+    <p>This should execute clean-up operations when no more write operations are to be performed on the file returned by <code>h5create</code>.
+If <code>failed = true</code>, any existing resources associated with the file may be deleted, and <code>null</code> should be returned, possibly asynchronously.</p>
 </div>
 
 
@@ -1221,7 +1183,10 @@ This is empty for scalar attributes, in which case <code>values</code> will have
     </dt>
     <dd>
         
-<span class="param-type">object</span>
+<span class="param-type">Uint8Array</span>
+|
+
+<span class="param-type">Promise.&lt;?Uint8Array></span>
 
 
 
@@ -1237,7 +1202,7 @@ This is empty for scalar attributes, in which case <code>values</code> will have
 
     
 
-    <h4 class="name" id="writeAttribute"><span class="type-signature"></span>writeAttribute<span class="signature">(attr, type, shape<span class="signature-attributes">nullable</span>, x, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="h5open"><span class="type-signature"></span>h5open<span class="signature">(path)</span><span class="type-signature"> &rarr; {<a href="H5Group.html">H5Group</a>|Promise.&lt;<a href="H5Group.html">H5Group</a>>}</span></h4>
 
     
 
@@ -1250,7 +1215,7 @@ This is empty for scalar attributes, in which case <code>values</code> will have
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="h5.js.html">h5.js</a>, <a href="h5.js.html#line40">line 40</a>
+        <a href="globals.js.html">globals.js</a>, <a href="globals.js.html#line79">line 79</a>
     </li></ul></dd>
     
 
@@ -1310,11 +1275,7 @@ This is empty for scalar attributes, in which case <code>values</code> will have
         <th>Type</th>
 
         
-        <th>Attributes</th>
-        
 
-        
-        <th>Default</th>
         
 
         <th class="last">Description</th>
@@ -1326,7 +1287,7 @@ This is empty for scalar attributes, in which case <code>values</code> will have
 
         <tr>
             
-                <td class="name"><code>attr</code></td>
+                <td class="name"><code>path</code></td>
             
 
             <td class="type">
@@ -1340,180 +1301,129 @@ This is empty for scalar attributes, in which case <code>values</code> will have
             </td>
 
             
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
 
             
-                <td class="default">
-                
-                </td>
-            
 
-            <td class="description last"><p>Name of the attribute.</p></td>
+            <td class="description last"><p>Path to a HDF5 file.
+This may be relative or absolute, depending on the application.
+The path may refer to a file not on the local filesystem, e.g., on a remote server, inside an archive file.</p></td>
         </tr>
 
     
-
-        <tr>
-            
-                <td class="name"><code>type</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
+    </tbody>
+</table>
 
 
 
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Type of attribute to create.
-This can be <code>&quot;IntX&quot;</code> or <code>&quot;UintX&quot;</code> for <code>X</code> of 8, 16, 32, or 64; or <code>&quot;FloatX&quot;</code> for <code>X</code> of 32 or 64; or <code>&quot;String&quot;</code>.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>shape</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array</span>
 
 
 
-            
-            </td>
 
-            
-                <td class="attributes">
-                
 
-                
-                    &lt;nullable><br>
-                
 
-                
-                </td>
-            
 
-            
-                <td class="default">
-                
-                </td>
-            
 
-            <td class="description last"><p>Array containing the dimensions of the attribute to create.
-If set to an empty array, this will create a scalar dataset.</p></td>
-        </tr>
 
-    
 
-        <tr>
-            
-                <td class="name"><code>x</code></td>
-            
 
-            <td class="type">
-            
-                
-<span class="param-type">TypedArray</span>
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A read-only handle to the HDF5 file, or a promise thereof.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="H5Group.html">H5Group</a></span>
 |
 
-<span class="param-type">Array</span>
+<span class="param-type">Promise.&lt;<a href="H5Group.html">H5Group</a>></span>
 
 
 
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Values to be written to the new attribute.
-This should be of length equal to the product of <code>shape</code> - unless <code>shape</code> is empty, in which case it should be of length 1.</p></td>
-        </tr>
+    </dd>
+</dl>
 
     
 
-        <tr>
-            
-                <td class="name"><code>options</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
 
 
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
+        
             
 
-            
-                <td class="default">
-                
-                    <code>{}</code>
-                
-                </td>
-            
+    
 
-            <td class="description last"><p>Optional parameters.</p>
-                <h6>Properties</h6>
-                
+    <h4 class="name" id="mkdir"><span class="type-signature"></span>mkdir<span class="signature">(path)</span><span class="type-signature"> &rarr; {undefined|Promise.&lt;undefined>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="globals.js.html">globals.js</a>, <a href="globals.js.html#line68">line 68</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
 
 <table class="params">
     <thead>
@@ -1525,11 +1435,7 @@ This should be of length equal to the product of <code>shape</code> - unless <co
         <th>Type</th>
 
         
-        <th>Attributes</th>
-        
 
-        
-        <th>Default</th>
         
 
         <th class="last">Description</th>
@@ -1541,13 +1447,13 @@ This should be of length equal to the product of <code>shape</code> - unless <co
 
         <tr>
             
-                <td class="name"><code>maxStringLength</code></td>
+                <td class="name"><code>path</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">string</span>
 
 
 
@@ -1555,37 +1461,13 @@ This should be of length equal to the product of <code>shape</code> - unless <co
             </td>
 
             
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                    &lt;nullable><br>
-                
-
-                
-                </td>
-            
 
             
-                <td class="default">
-                
-                    <code>null</code>
-                
-                </td>
-            
 
-            <td class="description last"><p>Maximum length of the strings to be saved.
-Only used when <code>type = &quot;String&quot;</code>.
-If <code>null</code>, this is inferred from the maximum length of strings in <code>data</code>.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-            </td>
+            <td class="description last"><p>Path to a directory.
+This may be relative or absolute, depending on the application.
+As with <a href="GlobalsInterface.html#get"><code>get</code></a>, the path may refer to a directory not on the local filesystem, e.g., on a remote server, inside an archive file.
+It is assumed that all parent directories have already been created.</p></td>
         </tr>
 
     
@@ -1607,6 +1489,220 @@ If <code>null</code>, this is inferred from the maximum length of strings in <co
 
 
 
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A new directory is created at <code>path</code>.
+(This may be a no-op if the application does not support creation of directories.)
+No value is returned, though the method may be asynchronous.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">undefined</span>
+|
+
+<span class="param-type">Promise.&lt;undefined></span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="write"><span class="type-signature"></span>write<span class="signature">(path, contents)</span><span class="type-signature"> &rarr; {undefined|Promise.&lt;undefined>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="globals.js.html">globals.js</a>, <a href="globals.js.html#line45">line 45</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>path</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Path to the file, see <a href="GlobalsInterface.html#get"><code>get</code></a> for details.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>contents</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Uint8Array</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Contents of the file.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <p><code>contents</code> is stored at <code>path</code>.
+The exact nature of this storage depends on the application -
+it may involve saving a file to the local filesystem, or uploading a file to a server, etc.
+If <code>path</code> already exists, it should be overwritten with <code>contents</code>.
+No value is returned, though the method may be asynchronous.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">undefined</span>
+|
+
+<span class="param-type">Promise.&lt;undefined></span>
+
+
+
+    </dd>
+</dl>
+
+    
 
 
 
