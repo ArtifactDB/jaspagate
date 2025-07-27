@@ -1,7 +1,7 @@
 import { readObject, saveObject, readObjectFile } from "./general.js";
 
 export async function readAnnotatedMetadata(path, globals, options, optname) {
-    if (!(await globals.fs.exists(path))) {
+    if (!(await globals.exists(path))) {
         return {};
     }
 

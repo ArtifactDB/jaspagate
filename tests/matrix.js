@@ -27,9 +27,9 @@ export class TestDenseMatrix {
 }
 
 jsp.readObjectRegistry["dense_array"] = async function(path, metadata, globals, options) {
-    let contents = await globals.fs.get(path + "/array.h5");
+    let contents = await globals.get(path + "/array.h5");
     try {
-        const fhandle = await globals.h5.open(contents, { readOnly: true });
+        const fhandle = await globals.h5open(contents, { readOnly: true });
         const handle_stack = [fhandle];
         try {
             let ghandle = fhandle.open("dense_array");
@@ -47,10 +47,10 @@ jsp.readObjectRegistry["dense_array"] = async function(path, metadata, globals, 
             for (const handle of handle_stack.reverse()) {
                 handle.close();
             }
-            globals.h5.close(fhandle);
+            globals.h5close(fhandle);
         }
     } finally {
-        globals.fs.clean(contents);
+        globals.clean(contents);
     }
 };
 
@@ -58,11 +58,11 @@ jsp.saveObjectRegistry.push(
     [
         TestDenseMatrix,
         async function(x, path, globals, options) {
-            await globals.fs.mkdir(path); 
-            await globals.fs.write(path + "/OBJECT", JSON.stringify({ "type": "dense_array", "dense_array": { "version": "1.0" } }));
+            await globals.mkdir(path); 
+            await globals.write(path + "/OBJECT", JSON.stringify({ "type": "dense_array", "dense_array": { "version": "1.0" } }));
 
             const h5path = path + "/array.h5";
-            const fhandle = await globals.h5.create(h5path);
+            const fhandle = await globals.h5create(h5path);
             let handle_stack = [fhandle];
             let success = false;
             try {
@@ -81,10 +81,7 @@ jsp.saveObjectRegistry.push(
                 for (const handle of handle_stack.reverse()) {
                     handle.close();
                 }
-                let payload = await globals.h5.finalize(fhandle, !success);
-                if (payload !== null) {
-                    await globals.fs.write(h5path, payload);
-                }
+                await globals.h5finish(fhandle, !success);
             }
         }
     ] 

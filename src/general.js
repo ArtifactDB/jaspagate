@@ -8,12 +8,12 @@ import { joinPath } from "./utils.js";
 
 /**
  * @param {string} path - Path to the takane-formatted object directory containing the {@link DataFrame}.
- * @param {object} globals - Object containing `fs`, an object satisfying the {@link GlobalFsInterface}. 
+ * @param {object} globals - Object satisfying the {@link GlobalsInterface}. 
  * @return {object} Object metadata.
  * @async
  */
 export async function readObjectFile(path, globals) {
-    let payload = await globals.fs.get(joinPath(path, "OBJECT"), { asBuffer: true });
+    let payload = await globals.get(joinPath(path, "OBJECT"), { asBuffer: true });
     let dec = new TextDecoder;
     return JSON.parse(dec.decode(payload));
 }
@@ -37,7 +37,7 @@ export const readObjectRegistry = {};
  * @param {string} path - Path to a takane-formatted object directory. 
  * @param {?object} metadata - Object metadata.
  * If `null`, this is automatically loaded by calling {@linkcode readObjectFile} on `path`.
- * @param {object} globals - Object containing `fs`, an object satisfying the {@link GlobalFsInterface}; and `h5`, an object satisfying the {@link GlobalH5Interface}.
+ * @param {object} globals - Object satisfying the {@link GlobalsInterface}.
  * @param {object} [options={}] - Further options, to be passed to the reader functions for individual takane object types.
  *
  * @return Some in-memory representation of the takane object at `path`.
@@ -89,7 +89,7 @@ export const saveObjectRegistry = [];
  *
  * @param {Any} x - The takane-compatible object to be saved.
  * @param {string} path - Path to the directory in which to save `x`.
- * @param {object} globals - Object containing `fs`, an object satisfying the {@link GlobalFsInterface}; and `h5`, an object satisfying the {@link GlobalH5Interface}.
+ * @param {object} globals - Object satisfying the {@link GlobalsInterface}.
  * @param {object} [options={}] - Further options.
  *
  * @return `x` is stored at `path`.
