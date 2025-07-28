@@ -14,8 +14,12 @@ import { joinPath } from "./utils.js";
  */
 export async function readObjectFile(path, globals) {
     let payload = await globals.get(joinPath(path, "OBJECT"), { asBuffer: true });
-    let dec = new TextDecoder;
-    return JSON.parse(dec.decode(payload));
+    try {
+        let dec = new TextDecoder;
+        return JSON.parse(dec.decode(payload));
+    } finally {
+        await globals.clean(payload);
+    }
 }
 
 /**
