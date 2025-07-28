@@ -40,7 +40,7 @@ let path = "artifacts2/SingleCellExperiment-full";
 if (fs.existsSync(path)) {
     fs.rmSync(path, { recursive: true, force: true });
 }
-jsp.saveObject(all_types, path, test_globals);
+await jsp.saveObject(all_types, path, test_globals);
 
 /*******************************/
 
@@ -56,4 +56,4 @@ path = "artifacts2/SingleCellExperiment-empty";
 if (fs.existsSync(path)) {
     fs.rmSync(path, { recursive: true, force: true });
 }
-jsp.saveObject(empty, path, test_globals);
+await jsp.saveObject(empty, path, test_globals);

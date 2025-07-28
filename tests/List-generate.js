@@ -27,7 +27,7 @@ let path = "artifacts2/List-all_types";
 if (fs.existsSync(path)) {
     fs.rmSync(path, { recursive: true, force: true });
 }
-jsp.saveObject(all_types, path, test_globals);
+await jsp.saveObject(all_types, path, test_globals);
 
 /*******************************/
 
@@ -44,7 +44,7 @@ path = "artifacts2/List-named";
 if (fs.existsSync(path)) {
     fs.rmSync(path, { recursive: true, force: true });
 }
-jsp.saveObject(named, path, test_globals);
+await jsp.saveObject(named, path, test_globals);
 
 /*******************************/
 
@@ -84,7 +84,7 @@ path = "artifacts2/List-scalars";
 if (fs.existsSync(path)) {
     fs.rmSync(path, { recursive: true, force: true });
 }
-jsp.saveObject(scalars, path, test_globals);
+await jsp.saveObject(scalars, path, test_globals);
 
 /*******************************/
 
@@ -94,7 +94,7 @@ path = "artifacts2/List-specials";
 if (fs.existsSync(path)) {
     fs.rmSync(path, { recursive: true, force: true });
 }
-jsp.saveObject(specials, path, test_globals);
+await jsp.saveObject(specials, path, test_globals);
 
 /*******************************/
 
@@ -104,7 +104,7 @@ path = "artifacts2/List-outofrange";
 if (fs.existsSync(path)) {
     fs.rmSync(path, { recursive: true, force: true });
 }
-jsp.saveObject(outofrange, path, test_globals);
+await jsp.saveObject(outofrange, path, test_globals);
 
 /*******************************/
 
@@ -119,7 +119,7 @@ path = "artifacts2/List-missing";
 if (fs.existsSync(path)) {
     fs.rmSync(path, { recursive: true, force: true });
 }
-jsp.saveObject(missingness, path, test_globals);
+await jsp.saveObject(missingness, path, test_globals);
 
 /*******************************/
 
@@ -138,7 +138,7 @@ path = "artifacts2/List-nested"
 if (fs.existsSync(path)) {
     fs.rmSync(path, { recursive: true, force: true });
 }
-jsp.saveObject(nested, path, test_globals);
+await jsp.saveObject(nested, path, test_globals);
 
 /*******************************/
 
@@ -155,7 +155,7 @@ path = "artifacts2/List-external"
 if (fs.existsSync(path)) {
     fs.rmSync(path, { recursive: true, force: true });
 }
-jsp.saveObject(external, path, test_globals);
+await jsp.saveObject(external, path, test_globals);
 
 /*******************************/
 
@@ -170,7 +170,7 @@ path = "artifacts2/List-custom"
 if (fs.existsSync(path)) {
     fs.rmSync(path, { recursive: true, force: true });
 }
-jsp.saveObject(custom, path, test_globals, { 
+await jsp.saveObject(custom, path, test_globals, { 
     List_saveOther: y => {
         if (y instanceof Thingy) {
             return { "type": "integer", "values": 12345678, "names": ["foobar"] };

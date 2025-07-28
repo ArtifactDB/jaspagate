@@ -39,7 +39,7 @@ let path = "artifacts2/DataFrame-all_types";
 if (fs.existsSync(path)) {
     fs.rmSync(path, { recursive: true, force: true });
 }
-jsp.saveObject(all_types, path, test_globals);
+await jsp.saveObject(all_types, path, test_globals);
 
 /*******************************/
 
@@ -62,7 +62,7 @@ path = "artifacts2/DataFrame-missing";
 if (fs.existsSync(path)) {
     fs.rmSync(path, { recursive: true, force: true });
 }
-jsp.saveObject(missingness, path, test_globals);
+await jsp.saveObject(missingness, path, test_globals);
 
 /*******************************/
 
@@ -84,7 +84,7 @@ path = "artifacts2/DataFrame-nested";
 if (fs.existsSync(path)) {
     fs.rmSync(path, { recursive: true, force: true });
 }
-jsp.saveObject(nested, path, test_globals);
+await jsp.saveObject(nested, path, test_globals);
 
 /*******************************/
 
@@ -97,7 +97,7 @@ path = "artifacts2/DataFrame-metadata";
 if (fs.existsSync(path)) {
     fs.rmSync(path, { recursive: true, force: true });
 }
-jsp.saveObject(hasmeta, path, test_globals);
+await jsp.saveObject(hasmeta, path, test_globals);
 
 /*******************************/
 
@@ -120,7 +120,7 @@ path = "artifacts2/DataFrame-custom";
 if (fs.existsSync(path)) {
     fs.rmSync(path, { recursive: true, force: true });
 }
-jsp.saveObject(custom, path, test_globals, {
+await jsp.saveObject(custom, path, test_globals, {
     DataFrame_saveOther: (y, handle, name) => {
         if (y instanceof Thingy) {
             let xhandle = handle.createDataSet(name, "Int8", [bioc.LENGTH(y)], { data: new Int8Array(bioc.LENGTH(y)) }); 

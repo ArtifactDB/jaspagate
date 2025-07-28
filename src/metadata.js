@@ -22,5 +22,5 @@ export async function saveAnnotatedMetadata(x, path, globals, options) {
     if (x.length() === 0) {
         return;
     }
-    saveObject(x, path, globals, options);
+    await saveObject(x, path, globals, options);
 }

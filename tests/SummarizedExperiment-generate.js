@@ -29,7 +29,7 @@ let path = "artifacts2/SummarizedExperiment-full";
 if (fs.existsSync(path)) {
     fs.rmSync(path, { recursive: true, force: true });
 }
-jsp.saveObject(full, path, test_globals);
+await jsp.saveObject(full, path, test_globals);
 
 /*******************************/
 
@@ -45,7 +45,7 @@ path = "artifacts2/SummarizedExperiment-empty";
 if (fs.existsSync(path)) {
     fs.rmSync(path, { recursive: true, force: true });
 }
-jsp.saveObject(empty, path, test_globals);
+await jsp.saveObject(empty, path, test_globals);
 
 /*******************************/
 
@@ -78,4 +78,4 @@ path = "artifacts2/SummarizedExperiment-unnamed";
 if (fs.existsSync(path)) {
     fs.rmSync(path, { recursive: true, force: true });
 }
-jsp.saveObject(unnamed, path, test_globals);
+await jsp.saveObject(unnamed, path, test_globals);

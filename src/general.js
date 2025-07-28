@@ -103,7 +103,7 @@ export async function saveObject(x, path, globals, options = {}) {
     for (var i = saveObjectRegistry.length; i > 0; i--) {
         const [cls, meth] = saveObjectRegistry[i - 1];
         if (x instanceof cls) {
-            meth(x, path, globals, options);
+            await meth(x, path, globals, options);
             return;
         }
     }
@@ -118,7 +118,7 @@ export async function saveObject(x, path, globals, options = {}) {
 
     for (const [cls, fun] of defaults) {
         if (x instanceof cls) {
-            fun(x, path, globals, options);
+            await fun(x, path, globals, options);
             return;
         }
     }
