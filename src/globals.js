@@ -5,27 +5,24 @@
  */
 export class GlobalsInterface {
     /**
-     * @param {string} path - Path to the file.
-     * This may be relative or absolute, depending on the application.
-     * The path may refer to a file not on the local filesystem, e.g., on a remote server, inside an archive file.
+     * @param {string} path - Local path to a file.
+     * This should lie inside some application-specific concept of a directory, even if a local filesystem does not exist (e.g., an S3 bucket, or a Zip archive).
      * @param {object} [options={}] - Further options.
      * @param {boolean} [options.asBuffer=false] - Whether to return the file contents as a Uint8Array.
      *
      * @return {Uint8Array|string|Promise<Uint8Array|string>}
      * Relative or absolute path to the file on the local filesystem.
-     * Callers should pass this path to {@linkcode GlobalsInterface#clean clean} once the file is no longer required.
-     *
      * If `asBuffer = true` or if no local filesystem is available, a Uint8Array of the file contents is returned instead.
-     * This does not need to be passed to `clean`.
-     *
      * A promise of a string or Uint8Array may also be returned.
+     *
+     * Callers should pass the (Promise-resolved) return value to {@linkcode GlobalsInterface#clean clean} once the file is no longer required.
      */
     get(path, options = {}) {
         throw new Error("'get()' is not implemented in this GlobalsInterface subclass");
     }
 
     /**
-     * @param {string} path - Path to the file, see {@linkcode GlobalsInterface#get get} for details.
+     * @param {string} path - Local path to a file, see {@linkcode GlobalsInterface#get get} for details.
      * @return {boolean|Promise<boolean>} Whether the `path` exists.
      */
     exists(path) {
@@ -33,7 +30,7 @@ export class GlobalsInterface {
     }
 
     /**
-     * @param {string} path - Path to the file, see {@linkcode GlobalsInterface#get get} for details.
+     * @param {string} path - Local path to a file, see {@linkcode GlobalsInterface#get get} for details.
      * @param {Uint8Array} contents - Contents of the file.
      *
      * @return {undefined|Promise<undefined>} `contents` is stored at `path`.
@@ -47,7 +44,7 @@ export class GlobalsInterface {
     }
 
     /**
-     * @param {string} x - Return value of {@linkcode GlobalsInterface#get get}.
+     * @param {string|Uint8Array} x - Return value of {@linkcode GlobalsInterface#get get}.
      * @return {undefined|Promise<undefined>} Any resources used by {@linkcode GlobalsInterface#get get} to return `x` can be freed.
      * For example, if `x` is a path referring to a temporary file, it can be removed.
      * No value is returned, though the method may be asynchronous.
@@ -57,8 +54,17 @@ export class GlobalsInterface {
     }
 
     /**
-     * @param {string} path - Path to a directory.
-     * This may be relative or absolute, depending on the application.
+     * @param {string} from - Local path to a file to be copied, see {@linkcode GlobalsInterface#get get} for details.
+     * @param {string} to - Local path to the new location of the file, see {@linkcode GlobalsInterface#get get} for details.
+     * @return {undefined|Promise<undefined>} The contents of `from` are copied to `to`.
+     * No value is returned, though the method may be asynchronous.
+     */
+    copy(from, to) {
+        throw new Error("'copy()' is not implemented in this GlobalsInterface subclass");
+    }
+
+    /**
+     * @param {string} path - Local path to a directory.
      * As with {@linkcode GlobalsInterface#get get}, the path may refer to a directory not on the local filesystem, e.g., on a remote server, inside an archive file.
      * It is assumed that all parent directories have already been created.
      * @return {undefined|Promise<undefined>} A new directory is created at `path`.
@@ -70,9 +76,8 @@ export class GlobalsInterface {
     }
 
     /**
-     * @param {string} path - Path to a HDF5 file.
-     * This may be relative or absolute, depending on the application.
-     * The path may refer to a file not on the local filesystem, e.g., on a remote server, inside an archive file.
+     * @param {string} path - Local path to a HDF5 file.
+     * As with {@linkcode GlobalsInterface#get get}, the path may refer to a file not on the local filesystem, e.g., on a remote server, inside an archive file.
      *
      * @return {H5Group|Promise<H5Group>} A read-only handle to the HDF5 file, or a promise thereof.
      */
@@ -91,9 +96,8 @@ export class GlobalsInterface {
     }
 
     /**
-     * @param {string} path - Path to a HDF5 file to be created.
-     * This may be relative or absolute, depending on the application.
-     * The path may refer to a location not on the local filesystem, e.g., on a remote server, inside an archive file.
+     * @param {string} path - Local path to a HDF5 file to be created.
+     * As with {@linkcode GlobalsInterface#get get}, the path may refer to a file not on the local filesystem, e.g., on a remote server, inside an archive file.
      *
      * @return {H5Group|Promise<H5Group>} A read-write handle to a new HDF5 file, or a promise thereof.
      * This may refer to, e.g.,  a temporary file in a virtual filesystem, if no local filesystem exists.

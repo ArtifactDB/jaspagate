@@ -152,6 +152,7 @@ export class H5DataSet {
     /**
      * @param {Array|TypedArray} x - Values to write to the dataset.
      * This should be of length equal to the product of {@linkcode H5DataSet#shape shape} -  unless `shape` is empty, in which case it should be of length 1.
+     * @param {object} [options={}] - Optional parameters.
      *
      * @return `x` is written to the dataset on file.
      * No return value is provided.
