@@ -131,7 +131,9 @@ let nested = new bioc.List({
     named: new bioc.List({
         foo: [1,2,3,4,5],
         bar: new bioc.List({ whee: "A", stuff: "a" })
-    })
+    }),
+    mixed: [1, "B", 3, "D"],
+    object: { foo: true, bar: false }
 })
 
 path = "artifacts2/List-nested"

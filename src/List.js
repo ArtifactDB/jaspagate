@@ -234,7 +234,7 @@ async function dump_json_list(x, path, globals, options, state) {
         let output = { "type": "list", "values": [], "names": [] };
         for (const [k, v] of Object.entries(x)) {
             output.names.push(k);
-            output.values.push(dump_json_list(v, path, globals, options, state));
+            output.values.push(await dump_json_list(v, path, globals, options, state));
         }
         return output;
 

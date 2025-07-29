@@ -77,9 +77,11 @@ test_that("saveList works with nested", {
     validateObject("artifacts2/List-nested")
     ll <- readObject("artifacts2/List-nested")
 
-    expect_identical(names(ll), c("unnamed", "named"))
+    expect_identical(names(ll), c("unnamed", "named", "mixed", "object"))
     expect_identical(ll[[1]], list(1:5*1.0, list(6:8*1.0, 9:10*1.0)))
     expect_identical(ll[[2]], list(foo=1:5*1.0, bar=list(whee="A", stuff="a")))
+    expect_identical(ll[[3]], list(1, "B", 3, "D"))
+    expect_identical(ll[[4]], list(foo=TRUE, bar=FALSE))
 })
 
 test_that("saveList works with external", {
