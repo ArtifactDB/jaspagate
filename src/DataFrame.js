@@ -22,7 +22,7 @@ import { readAnnotatedMetadata, saveAnnotatedMetadata } from "./metadata.js";
  * @param {function|boolean} [options.DataFrame_readMetadata=true] - How to read the metadata.
  * If `true`, {@linkcode readObject} is used, while if `false`, metadata will be skipped.
  * If a function is provided, it should accept `path`, `metadata`, `globals` and `options` (as described above), and return a {@link external:List List}.
- * @param {boolean} [options.List_toTypedArray=false] - Whether to report integer/number vectors without missing values as TypedArrays.
+ * @param {boolean} [options.DataFrame_toTypedArray=false] - Whether to report integer/number vectors without missing values as TypedArrays.
  * If `false`, vectors are reported as instances of an appropriately-typed {@link List} subclass.
  *
  * @return {external:DataFrame} The data frame.
@@ -298,9 +298,9 @@ export async function saveDataFrame(x, path, globals, options = {}) {
         let ghandle = fhandle.createGroup("data_frame");
         handle_stack.push(ghandle);
         ghandle.writeAttribute("row-count", "Uint64", [], [x.numberOfRows()]);
-        ghandle.createDataSet("column_names", "String", [ x.numberOfColumns() ], { data: x.columnNames(), returnHandle: false });
+        ghandle.createDataSet("column_names", "String", [ x.numberOfColumns() ], { data: x.columnNames() }).close();
         if (x.rowNames() != null) {
-            ghandle.createDataSet("row_names", "String", [ x.numberOfRows() ], { data: x.rowNames(), returnHandle: false });
+            ghandle.createDataSet("row_names", "String", [ x.numberOfRows() ], { data: x.rowNames() }).close();
         }
 
         let dhandle = ghandle.createGroup("data");
