@@ -1,7 +1,7 @@
 import { readObject, saveObject, readObjectFile } from "./general.js";
 
 export async function readAnnotatedMetadata(path, globals, options, optname) {
-    if (!(await globals.exists(path))) {
+    if (!(await globals.exists(path + "/OBJECT"))) { // check existence of file, not directory.
         return {};
     }
 

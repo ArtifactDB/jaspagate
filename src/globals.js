@@ -23,6 +23,8 @@ export class GlobalsInterface {
 
     /**
      * @param {string} path - Local path to a file, see {@linkcode GlobalsInterface#get get} for details.
+     * Note that this should not be a path to a directory;
+     * developers of {@linkcode readObject} functions should check for the existence of particular files inside a directory, rather than the directory itself.
      * @return {boolean|Promise<boolean>} Whether the `path` exists.
      */
     exists(path) {
