@@ -2,7 +2,7 @@ import { RangedSummarizedExperiment } from "bioconductor";
 import { H5Group, H5DataSet } from "./h5.js";
 import { readObject, readObjectFile, saveObject } from "./general.js";
 import { readSummarizedExperiment, saveSummarizedExperiment } from "./SummarizedExperiment.js"; 
-import { joinPath } from "./utils.js";
+import { joinPath, jsonBuffer } from "./utils.js";
 
 /**
  * A ranged summarized experiment.
@@ -52,5 +52,5 @@ export async function saveRangedSummarizedExperiment(x, path, globals, options =
     const existing = await readObjectFile(path, globals);
     existing.type = "ranged_summarized_experiment";
     existing.ranged_summarized_experiment = { "version": "1.0" };
-    await globals.write(joinPath(path, "OBJECT"), JSON.stringify(existing));
+    await globals.write(joinPath(path, "OBJECT"), jsonBuffer(existing));
 }

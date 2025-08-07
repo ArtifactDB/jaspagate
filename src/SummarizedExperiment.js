@@ -1,7 +1,7 @@
 import { DataFrame, SummarizedExperiment } from "bioconductor";
 import { H5Group, H5DataSet } from "./h5.js";
 import { readObject, readObjectFile, saveObject } from "./general.js";
-import { joinPath } from "./utils.js";
+import { joinPath, jsonBuffer } from "./utils.js";
 import { readAnnotatedMetadata, saveAnnotatedMetadata } from "./metadata.js";
 
 /**
@@ -86,7 +86,7 @@ export async function readSummarizedExperiment(path, metadata, globals, options 
  */
 export async function saveSummarizedExperiment(x, path, globals, options = {}) {
     await globals.mkdir(path);
-    await globals.write(joinPath(path, "OBJECT"), JSON.stringify({
+    await globals.write(joinPath(path, "OBJECT"), jsonBuffer({
         type: "summarized_experiment",
         summarized_experiment: {
             version: "1.0",
@@ -98,7 +98,7 @@ export async function saveSummarizedExperiment(x, path, globals, options = {}) {
     if (assay_names.length > 0) {
         const adir = joinPath(path, "assays");
         await globals.mkdir(adir);
-        await globals.write(joinPath(adir, "names.json"), JSON.stringify(assay_names));
+        await globals.write(joinPath(adir, "names.json"), jsonBuffer(assay_names));
         for (const [i, aname] of Object.entries(assay_names)) {
             await saveObject(x.assay(aname), joinPath(adir, String(i)), globals, options);
         }

@@ -1,4 +1,5 @@
 import * as jsp from "../src/index.js";
+import * as internal from "../src/utils.js";
 
 export class TestDenseMatrix {
     #rows;
@@ -59,7 +60,7 @@ jsp.saveObjectRegistry.push(
         TestDenseMatrix,
         async function(x, path, globals, options) {
             await globals.mkdir(path); 
-            await globals.write(path + "/OBJECT", JSON.stringify({ "type": "dense_array", "dense_array": { "version": "1.0" } }));
+            await globals.write(path + "/OBJECT", internal.jsonBuffer({ "type": "dense_array", "dense_array": { "version": "1.0" } }));
 
             const h5path = path + "/array.h5";
             const fhandle = await globals.h5create(h5path);

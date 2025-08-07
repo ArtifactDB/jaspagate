@@ -1,7 +1,7 @@
 import { DataFrame, List, IntegerList, NumberList, BooleanList, StringList } from "bioconductor";
 import { H5Group, H5DataSet } from "./h5.js";
 import { readObject, readObjectFile, saveObject } from "./general.js";
-import { joinPath, formatNumberArrayForHdf5, formatIntegerArrayForHdf5, formatStringArrayForHdf5, formatBooleanArrayForHdf5 } from "./utils.js";
+import { joinPath, formatNumberArrayForHdf5, formatIntegerArrayForHdf5, formatStringArrayForHdf5, formatBooleanArrayForHdf5, jsonBuffer } from "./utils.js";
 import { readAnnotatedMetadata, saveAnnotatedMetadata } from "./metadata.js";
 
 /**
@@ -287,7 +287,7 @@ export async function readDataFrame(path, metadata, globals, options = {}) {
  */
 export async function saveDataFrame(x, path, globals, options = {}) {
     await globals.mkdir(path);
-    await globals.write(joinPath(path, "OBJECT"), JSON.stringify({ type: "data_frame", data_frame: { version: "1.1" } }));
+    await globals.write(joinPath(path, "OBJECT"), jsonBuffer({ type: "data_frame", data_frame: { version: "1.1" } }));
 
     let externals = {};
     let success = false;

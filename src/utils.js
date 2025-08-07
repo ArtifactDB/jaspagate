@@ -137,3 +137,9 @@ export function formatBooleanArrayForHdf5(x) {
         placeholder: (x.some(y => y == null) ? 2 : null)
     };
 }
+
+export function jsonBuffer(obj) {
+    const str = JSON.stringify(obj);
+    const enc = new TextEncoder;
+    return enc.encode(str);
+}

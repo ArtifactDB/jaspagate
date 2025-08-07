@@ -2,7 +2,7 @@ import { SingleCellExperiment } from "bioconductor";
 import { H5Group, H5DataSet } from "./h5.js";
 import { readObject, readObjectFile, saveObject } from "./general.js";
 import { readRangedSummarizedExperiment, saveRangedSummarizedExperiment } from "./RangedSummarizedExperiment.js"; 
-import { joinPath } from "./utils.js";
+import { joinPath, jsonBuffer } from "./utils.js";
 
 /**
  * A single-cell experiment.
@@ -118,13 +118,13 @@ export async function saveSingleCellExperiment(x, path, globals, options = {}) {
     if (mexp !== null) {
         existing.single_cell_experiment.main_experiment_name = mexp;
     }
-    await globals.write(joinPath(path, "OBJECT"), JSON.stringify(existing));
+    await globals.write(joinPath(path, "OBJECT"), jsonBuffer(existing));
 
     const reddim_names = x.reducedDimensionNames();
     if (reddim_names.length > 0) {
         let rddir = joinPath(path, "reduced_dimensions");
         await globals.mkdir(rddir);
-        await globals.write(joinPath(rddir, "names.json"), JSON.stringify(reddim_names));
+        await globals.write(joinPath(rddir, "names.json"), jsonBuffer(reddim_names));
         for (const [i, rname] of Object.entries(reddim_names)) {
             await saveObject(x.reducedDimension(rname), joinPath(rddir, String(i)), globals, options);
         }
@@ -134,7 +134,7 @@ export async function saveSingleCellExperiment(x, path, globals, options = {}) {
     if (altexp_names.length > 0) {
         let aedir = joinPath(path, "alternative_experiments")
         await globals.mkdir(aedir);
-        await globals.write(joinPath(aedir, "names.json"), JSON.stringify(altexp_names));
+        await globals.write(joinPath(aedir, "names.json"), jsonBuffer(altexp_names));
         for (const [i, aname] of Object.entries(altexp_names)) {
             await saveObject(x.alternativeExperiment(aname), joinPath(aedir, String(i)), globals, options);
         }

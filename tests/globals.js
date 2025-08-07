@@ -11,7 +11,12 @@ export const test_globals = {
         }
     },
     exists: path => fs.existsSync(path),
-    write: (path, contents) => fs.writeFileSync(path, contents),
+    write: (path, contents) => {
+        if (!(contents instanceof Uint8Array)) {
+            throw new Error("expected 'contents' to be a Uint8Array");
+        }
+        fs.writeFileSync(path, contents);
+    },
     clean: (path) => {}, // no-op
     mkdir: path => fs.mkdirSync(path),
     h5open: async function(path) {

@@ -1,7 +1,7 @@
 import { List, IntegerList, StringList, BooleanList, NumberList } from "bioconductor";
 import { H5Group, H5DataSet } from "./h5.js";
 import { readObject, readObjectFile, saveObject } from "./general.js";
-import { joinPath, exceedsInt32 } from "./utils.js";
+import { joinPath, exceedsInt32, jsonBuffer } from "./utils.js";
 
 function load_number(x) {
     if (x === "NaN") {
@@ -297,7 +297,7 @@ export async function saveList(x, path, globals, options = {}) {
             format: "json.gz"
         }
     };
-    await globals.write(joinPath(path, "OBJECT"), JSON.stringify(objmeta));
+    await globals.write(joinPath(path, "OBJECT"), jsonBuffer(objmeta));
 
     let converted = await dump_json_list(x, path, globals, options, { index: 0 });
     let stringified = JSON.stringify(converted);
